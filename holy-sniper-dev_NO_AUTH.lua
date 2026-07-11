@@ -1399,7 +1399,7 @@ function HolyCanUseFiles()
         and type(isfile) == "function"
 end
 
-function HolyEnsureFolder()
+function -- HolyEnsureFolder()
 
     if type(makefolder) ~= "function"
     or type(isfolder) ~= "function" then
@@ -1423,11 +1423,11 @@ end
 
 function HolySaveUISettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     local payload = {
         ShowUIOnLoad =
@@ -1488,7 +1488,7 @@ end
 
 function HolyLoadUISettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -1987,11 +1987,11 @@ end
 
 function HolySaveVisualSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
     HolyVisualEnsureState()
 
     local payload = {
@@ -2085,7 +2085,7 @@ end
 
 function HolyLoadVisualSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -2244,7 +2244,7 @@ function HolyLoadGroupboxSettings()
         and HOLY_GROUPBOX_STATE.Collapsed
         or {}
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -2321,11 +2321,11 @@ end
 
 function HolySaveGroupboxSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     HOLY_GROUPBOX_STATE =
         type(HOLY_GROUPBOX_STATE) == "table"
@@ -2680,11 +2680,11 @@ end
 
 function HolySaveShopSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     local payload = {
         Mode =
@@ -2932,7 +2932,7 @@ end
 
 function HolyLoadShopSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -4259,11 +4259,11 @@ end
 
 function HolySaveFarmSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     HolyFarmEnsureState()
 
@@ -4333,7 +4333,7 @@ end
 
 function HolyLoadFarmSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -8561,11 +8561,11 @@ end
 
 function HolySaveFruitAutomationSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
     HolyFruitAutomationEnsureState()
 
     local payload = {
@@ -8646,7 +8646,7 @@ end
 
 function HolyLoadFruitAutomationSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -23628,11 +23628,11 @@ end
 
 function HolySaveSniperSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     local payload = {
         ActivateSniper =
@@ -23765,7 +23765,7 @@ end
 
 function HolyLoadSniperSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -25259,11 +25259,11 @@ end
 
 function HolySaveServerSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     local state =
         HolyServerNormalizeState()
@@ -25326,7 +25326,7 @@ end
 
 function HolyLoadServerSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -49397,7 +49397,7 @@ function HolyServerFinderSetAutoJoinMode(value)
         )
 
     if wantedMode ~= "Off"
-    and HolyAuthRequireServerSniper(
+    and -- HolyAuthRequireServerSniper(
         "Auto Join",
         true
     ) ~= true then
@@ -50771,7 +50771,7 @@ end
 
 function HolyServerFinderJoinRow(row, source, targetInfo)
 
-    if HolyAuthRequireServerSniper(
+    if -- HolyAuthRequireServerSniper(
         tostring(source or "Server Finder Join"),
         true
     ) ~= true then
@@ -50932,7 +50932,7 @@ function HolyServerFinderEvaluateAutoJoin(hud)
         return false
     end
 
-    if HolyAuthRequireServerSniper(
+    if -- HolyAuthRequireServerSniper(
         "Auto Join",
         false
     ) ~= true then
@@ -53435,7 +53435,7 @@ end
 
 function HolyServerFinderShowAutoJoinRulesPopup()
 
-    if HolyAuthRequireServerSniper(
+    if -- HolyAuthRequireServerSniper(
         "Auto Join Rules",
         true
     ) ~= true then
@@ -53565,11 +53565,11 @@ end
 
 function HolySaveServerFinderSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
-    HolyEnsureFolder()
+    -- HolyEnsureFolder()
 
     local encodeOk,
         encoded =
@@ -53623,7 +53623,7 @@ end
 
 function HolyLoadServerFinderSettings()
 
-    if HolyCanUseFiles() ~= true then
+    if false then
         return false
     end
 
@@ -53810,7 +53810,6 @@ function HolyLoadServerFinderSettings()
     return true
 end
 
-HolyLoadServerFinderSettings()
 
 function HolyServerFinderAddUniqueChoice(list, seen, value)
 
@@ -56090,7 +56089,7 @@ end
 
 function HolyServerFinderFetchBackendRows()
 
-    if HolyAuthRequireServerSniper(
+    if -- HolyAuthRequireServerSniper(
         "Server Finder Backend",
         false
     ) ~= true then
@@ -56892,7 +56891,7 @@ end
 
 function HolyServerFinderRefreshRows(hud, reason)
 
-    if HolyAuthRequireServerSniper(
+    if -- HolyAuthRequireServerSniper(
         "Server Finder Refresh",
         true
     ) ~= true then
@@ -57142,7 +57141,7 @@ function HolyServerFinderSetHudVisible(value)
         value == true
 
     if value == true
-    and HolyAuthRequireServerSniper(
+    and -- HolyAuthRequireServerSniper(
         "Server Pet Finder HUD",
         true
     ) ~= true then
@@ -57191,7 +57190,7 @@ end
 
 function HolyServerFinderOpenHud()
 
-    if HolyAuthRequireServerSniper(
+    if -- HolyAuthRequireServerSniper(
         "Server Pet Finder HUD",
         true
     ) ~= true then
@@ -57402,7 +57401,7 @@ function HolySniperSetPageMode(value)
         setupVisible ~= true
 
     if serverVisible == true
-    and HolyAuthHasServerSniperSlot() ~= true then
+    and -- HolyAuthHasServerSniperSlot() ~= true then
 
         HolyServerSniperForceLockedOff(
             "Server Sniper page",
@@ -58818,7 +58817,7 @@ SniperWatchlistBox:AddButton({
 
 HolySniperAddLabel(
     ServerSniperBox,
-    HolyAuthHasServerSniperSlot() == true
+    -- HolyAuthHasServerSniperSlot() == true
     and "✅ Server Sniper slot active. Server Pet Finder HUD, auto join, and join buttons are unlocked."
     or "🔒 Server Sniper Slot Required\nServer Pet Finder HUD, auto join, server rows, and join buttons require an active slot. Sniper Setup still works normally."
 )
@@ -58828,13 +58827,13 @@ HOLY_SERVER_FINDER_TOGGLE =
         "HolyServerFinderHudToggle",
         {
             Text =
-                HolyAuthHasServerSniperSlot() == true
+                -- HolyAuthHasServerSniperSlot() == true
                 and "Server Pet Finder HUD"
                 or "🔒 Server Pet Finder HUD",
 
             Default =
                 HOLY_SERVER_FINDER_STATE.Enabled == true
-                and HolyAuthHasServerSniperSlot() == true,
+                and -- HolyAuthHasServerSniperSlot() == true,
 
             Tooltip =
                 "Requires an active Server Sniper slot.",
@@ -58848,7 +58847,7 @@ HOLY_SERVER_FINDER_TOGGLE:OnChanged(function(value)
     end
 
     if value == true
-    and HolyAuthRequireServerSniper(
+    and -- HolyAuthRequireServerSniper(
         "Server Pet Finder HUD",
         true
     ) ~= true then
@@ -58872,7 +58871,7 @@ end)
 
 if HOLY_SERVER_FINDER_STATE.Enabled == true then
 
-    if HolyAuthHasServerSniperSlot() == true then
+    if -- HolyAuthHasServerSniperSlot() == true then
 
         task.defer(function()
 
