@@ -23377,4 +23377,5 @@ SOPHIA_MAIL_RUNTIME.Stop =
         )
     end
 
-GAG2PremiumShowKeyGate()
+-- GAG2PremiumShowKeyGate() -- Key system removed
+
