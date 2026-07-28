@@ -45,6 +45,66 @@ local SOPHIA_MAIL_THEME = {
 local UI_SETTINGS_FOLDER = "GAG2Premium"
 
 -- ============================================================
+-- MISSING FUNCTION DEFINITIONS
+-- ============================================================
+
+local function SophiaCanUseFiles()
+    return isfile ~= nil and writefile ~= nil and readfile ~= nil
+end
+
+local function SophiaEnsureFolder(folderName)
+    if SophiaCanUseFiles() then
+        if not isfolder(folderName) then
+            pcall(function()
+                makefolder(folderName)
+            end)
+        end
+        return true
+    end
+    return false
+end
+
+function SophiaNotify(title, message, duration)
+    duration = duration or 3
+    warn("[GAG2 Premium] " .. tostring(title) .. ": " .. tostring(message))
+    return true
+end
+
+function SophiaSniperSetLabel(label, text)
+    if type(label) == "table" and type(label.SetText) == "function" then
+        pcall(function()
+            label:SetText(tostring(text))
+        end)
+    end
+end
+
+local function formatValue(value)
+    value = tonumber(value) or 0
+    if value >= 1e6 then
+        return string.format("%.1fM", value / 1e6)
+    elseif value >= 1e3 then
+        return string.format("%.1fK", value / 1e3)
+    else
+        return tostring(math.floor(value))
+    end
+end
+
+local function parseValue(text)
+    if type(text) ~= "string" then return 0 end
+    text = text:lower():gsub("%s+", ""):gsub(",", "")
+    local num = tonumber(text:match("^[%d.]+")) or 0
+    if text:find("b") then
+        return num * 1e9
+    elseif text:find("m") then
+        return num * 1e6
+    elseif text:find("k") then
+        return num * 1e3
+    else
+        return num
+    end
+end
+
+-- ============================================================
 -- [3.10] MAIL DELIVERY HUD
 --==================================================
 
