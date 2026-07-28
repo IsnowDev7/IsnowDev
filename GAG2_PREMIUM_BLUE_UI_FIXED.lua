@@ -53,15 +53,21 @@ local function SophiaCanUseFiles()
 end
 
 local function SophiaEnsureFolder(folderName)
-    if SophiaCanUseFiles() then
-        if not isfolder(folderName) then
-            pcall(function()
-                makefolder(folderName)
-            end)
-        end
-        return true
+    if not folderName or type(folderName) ~= "string" or folderName == "" then
+        return false
     end
-    return false
+    
+    if not SophiaCanUseFiles() then
+        return false
+    end
+    
+    pcall(function()
+        if not isfolder(folderName) then
+            makefolder(folderName)
+        end
+    end)
+    
+    return true
 end
 
 function SophiaNotify(title, message, duration)
@@ -262,7 +268,7 @@ local function GAG2PremiumWriteJsonFile(
         return false
     end
 
-    SophiaEnsureFolder()
+    SophiaEnsureFolder(UI_SETTINGS_FOLDER)
 
     local encodeOk,
         encoded =
@@ -328,7 +334,7 @@ local function GAG2PremiumPrepareAccountFiles()
         return false
     end
 
-    SophiaEnsureFolder()
+    SophiaEnsureFolder(UI_SETTINGS_FOLDER)
 
     local migration =
         GAG2PremiumReadJsonFile(
@@ -547,7 +553,7 @@ function GAG2PremiumHistorySave()
         return false
     end
 
-    SophiaEnsureFolder()
+    SophiaEnsureFolder(UI_SETTINGS_FOLDER)
 
     local encodeOk, encoded =
         pcall(function()
@@ -1853,7 +1859,7 @@ function GAG2PremiumSaveSettings()
         return false
     end
 
-    SophiaEnsureFolder()
+    SophiaEnsureFolder(UI_SETTINGS_FOLDER)
 
     local position =
         type(SOPHIA_MAIL_STATE.HudPosition) == "table"
