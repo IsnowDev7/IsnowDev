@@ -1017,6 +1017,187 @@ function Nexus:CreateWindow(options)
                 return Graph
             end
 
+            -- [[ MULTI-DROPDOWN COMPONENT ]]
+            function Section:AddMultiDropdown(text, options, default, callback)
+                local Drp = Utils:Create("Frame", {
+                    Size = UDim2.new(1, 0, 0, 48),
+                    BackgroundColor3 = Nexus.CurrentTheme.Secondary,
+                    ClipsDescendants = true,
+                    Parent = Content
+                })
+                Utils:Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = Drp})
+
+                local Header = Utils:Create("TextButton", {
+                    Size = UDim2.new(1, 0, 0, 48),
+                    BackgroundTransparency = 1,
+                    Text = "    " .. text,
+                    TextColor3 = Nexus.CurrentTheme.Text,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 15,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Parent = Drp
+                })
+
+                local Selected = {}
+                for _, v in ipairs(default) do Selected[v] = true end
+
+                local CountLabel = Utils:Create("TextLabel", {
+                    Size = UDim2.new(0, 30, 0, 20),
+                    Position = UDim2.new(1, -45, 0.5, -10),
+                    BackgroundColor3 = Nexus.CurrentTheme.Accent,
+                    Text = #default,
+                    TextColor3 = Color3.new(1, 1, 1),
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 12,
+                    Parent = Header
+                })
+                Utils:Create("UICorner", {CornerRadius = UDim.new(0, 5), Parent = CountLabel})
+
+                local List = Utils:Create("Frame", {
+                    Size = UDim2.new(1, -20, 0, 0),
+                    Position = UDim2.new(0, 10, 0, 55),
+                    BackgroundTransparency = 1,
+                    Parent = Drp
+                })
+                Utils:Create("UIListLayout", {Padding = UDim.new(0, 5), Parent = List})
+
+                local Open = false
+                Header.MouseButton1Click:Connect(function()
+                    Open = not Open
+                    TweenService:Create(Drp, TweenInfo.new(0.4, Enum.EasingStyle.Quart), {Size = UDim2.new(1, 0, 0, Open and (60 + #options * 38) or 48)}):Play()
+                end)
+
+                for _, opt in ipairs(options) do
+                    local OptBtn = Utils:Create("TextButton", {
+                        Size = UDim2.new(1, 0, 0, 35),
+                        BackgroundColor3 = Selected[opt] and Nexus.CurrentTheme.Accent or Nexus.CurrentTheme.Main,
+                        BackgroundTransparency = Selected[opt] and 0.8 or 0.5,
+                        Text = "    " .. tostring(opt),
+                        TextColor3 = Selected[opt] and Nexus.CurrentTheme.Text or Nexus.CurrentTheme.TextDim,
+                        Font = Enum.Font.Gotham,
+                        TextSize = 14,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        Parent = List
+                    })
+                    Utils:Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = OptBtn})
+
+                    OptBtn.MouseButton1Click:Connect(function()
+                        Selected[opt] = not Selected[opt]
+                        TweenService:Create(OptBtn, TweenInfo.new(0.2), {
+                            BackgroundColor3 = Selected[opt] and Nexus.CurrentTheme.Accent or Nexus.CurrentTheme.Main,
+                            BackgroundTransparency = Selected[opt] and 0.8 or 0.5,
+                            TextColor3 = Selected[opt] and Nexus.CurrentTheme.Text or Nexus.CurrentTheme.TextDim
+                        }):Play()
+                        
+                        local current = {}
+                        for k, v in pairs(Selected) do if v then table.insert(current, k) end end
+                        CountLabel.Text = #current
+                        callback(current)
+                    end)
+                end
+                return Drp
+            end
+
+            -- [[ TREE VIEW COMPONENT ]]
+            function Section:AddTreeView(title, data)
+                local Tree = Utils:Create("Frame", {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundColor3 = Nexus.CurrentTheme.Secondary,
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Parent = Content
+                })
+                Utils:Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = Tree})
+
+                local Title = Utils:Create("TextLabel", {
+                    Size = UDim2.new(1, -20, 0, 35),
+                    Position = UDim2.new(0, 10, 0, 5),
+                    BackgroundTransparency = 1,
+                    Text = title,
+                    TextColor3 = Nexus.CurrentTheme.Text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 14,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Parent = Tree
+                })
+
+                local Container = Utils:Create("Frame", {
+                    Size = UDim2.new(1, -20, 0, 0),
+                    Position = UDim2.new(0, 10, 0, 40),
+                    BackgroundTransparency = 1,
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Parent = Tree
+                })
+                Utils:Create("UIListLayout", {Padding = UDim.new(0, 5), Parent = Container})
+
+                local function Render(parent, nodeData, depth)
+                    for k, v in pairs(nodeData) do
+                        local Node = Utils:Create("TextButton", {
+                            Size = UDim2.new(1, 0, 0, 25),
+                            BackgroundTransparency = 1,
+                            Text = string.rep("  ", depth) .. (typeof(v) == "table" and "▶ " or "• ") .. tostring(k),
+                            TextColor3 = Nexus.CurrentTheme.TextDim,
+                            Font = Enum.Font.Gotham,
+                            TextSize = 13,
+                            TextXAlignment = Enum.TextXAlignment.Left,
+                            Parent = parent
+                        })
+                        if typeof(v) == "table" then
+                            local Sub = Utils:Create("Frame", {
+                                Size = UDim2.new(1, 0, 0, 0),
+                                BackgroundTransparency = 1,
+                                Visible = false,
+                                AutomaticSize = Enum.AutomaticSize.Y,
+                                Parent = parent
+                            })
+                            Utils:Create("UIListLayout", {Padding = UDim.new(0, 2), Parent = Sub})
+                            Render(Sub, v, depth + 1)
+                            
+                            Node.MouseButton1Click:Connect(function()
+                                Sub.Visible = not Sub.Visible
+                                Node.Text = string.rep("  ", depth) .. (Sub.Visible and "▼ " or "▶ ") .. tostring(k)
+                            end)
+                        end
+                    end
+                end
+                Render(Container, data, 0)
+                return Tree
+            end
+
+            -- [[ VIEWPORT COMPONENT ]]
+            function Section:AddViewport(model)
+                local VPFrame = Utils:Create("Frame", {
+                    Size = UDim2.new(1, 0, 0, 200),
+                    BackgroundColor3 = Color3.fromRGB(10, 10, 12),
+                    Parent = Content
+                })
+                Utils:Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = VPFrame})
+
+                local VP = Utils:Create("ViewportFrame", {
+                    Size = UDim2.new(1, -10, 1, -10),
+                    Position = UDim2.new(0, 5, 0, 5),
+                    BackgroundTransparency = 1,
+                    Parent = VPFrame
+                })
+                
+                local Cam = Instance.new("Camera")
+                VP.CurrentCamera = Cam
+                Cam.Parent = VP
+                
+                local target = model:Clone()
+                target.Parent = VP
+                
+                local cf, size = target:GetBoundingBox()
+                Cam.CFrame = CFrame.new(cf.Position + Vector3.new(0, size.Y, size.Z * 2), cf.Position)
+                
+                task.spawn(function()
+                    while VPFrame.Parent do
+                        target:PivotTo(target:GetPivot() * CFrame.Angles(0, math.rad(1), 0))
+                        task.wait()
+                    end
+                end)
+                return VPFrame
+            end
+
             return Section
         end
 
