@@ -5631,6 +5631,7 @@ do
             BackgroundColor3 = "MainColor",
             Position = UDim2.fromScale(1, 0),
             Size = UDim2.fromOffset(32, 18),
+            ZIndex = 2,
             Parent = Button,
         })
         New("UICorner", {
@@ -5652,7 +5653,7 @@ do
         local Ball = New("Frame", {
             BackgroundColor3 = "FontColor",
             Size = UDim2.fromScale(1, 1),
-            ZIndex = 3,
+            ZIndex = 4,
             SizeConstraint = Enum.SizeConstraint.RelativeYY,
             Parent = Switch,
         })
@@ -5664,11 +5665,12 @@ do
         if Library.LiquidGlass then
             local Glass = New("ImageLabel", {
                 Name = "Glass",
-                Size = UDim2.fromScale(1, 1),
+                Size = UDim2.new(1, 4, 1, 4),
+                Position = UDim2.fromOffset(-2, -2),
                 BackgroundTransparency = 1,
                 Image = Library.GlassSpritesheet.Id,
-                ImageTransparency = 0.5,
-                ZIndex = 2,
+                ImageTransparency = 0.8,
+                ZIndex = 1,
                 Parent = Switch
             })
             New("UICorner", {
@@ -5727,7 +5729,7 @@ do
                 local Id, RectSize, RectOffset = Library:GetGlassFrame(T)
                 
                 TweenService:Create(Toggle.Glass, Library.TweenInfo, {
-                    ImageTransparency = Toggle.Value and 0 or 0.5
+                    ImageTransparency = Toggle.Value and 0.2 or 0.8
                 }):Play()
                 
                 Toggle.Glass.Image = Id
@@ -5826,7 +5828,7 @@ do
                     Toggle.Glass.Image = Id
                     Toggle.Glass.ImageRectSize = RectSize
                     Toggle.Glass.ImageRectOffset = RectOffset
-                    Toggle.Glass.ImageTransparency = math.clamp(1 - Percent, 0.2, 0.8)
+                    Toggle.Glass.ImageTransparency = math.clamp(0.8 - (Percent * 0.6), 0.2, 0.8)
                 end
             end)
 
@@ -8715,12 +8717,13 @@ function Library:Notify(...)
                 task.wait()
             until DeletedInstance or Data.Destroyed
         else
+            local WaitTime = tonumber(Data.Time) or 5
             TweenService
-                :Create(TimerFill, TweenInfo.new(Data.Time, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+                :Create(TimerFill, TweenInfo.new(WaitTime, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
                     Size = UDim2.fromScale(0, 1),
                 })
                 :Play()
-            task.wait(Data.Time)
+            task.wait(WaitTime)
         end
 
         if not Data.Destroyed then
