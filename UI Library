@@ -4728,7 +4728,7 @@ do
         local Label = New("TextLabel", {
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 1, 0),
-            Text = string.format("%s: <font color=\"rgb(%d, %d, %d)\">%s</font>", Stat.Text, Library.Scheme.AccentColor.R*255, Library.Scheme.AccentColor.G*255, Library.Scheme.AccentColor.B*255, Stat.Value),
+            Text = "",
             TextSize = 14,
             TextTransparency = 0.4,
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -4736,14 +4736,19 @@ do
             Parent = Holder,
         })
 
+        local function UpdateText()
+            local Accent = Library.Scheme.AccentColor
+            Label.Text = string.format("%s: <font color=\"rgb(%d, %d, %d)\">%s</font>", Stat.Text, math.floor(Accent.R*255), math.floor(Accent.G*255), math.floor(Accent.B*255), tostring(Stat.Value))
+        end
+
         function Stat:SetText(Text)
             Stat.Text = Text
-            Label.Text = string.format("%s: <font color=\"rgb(%d, %d, %d)\">%s</font>", Stat.Text, Library.Scheme.AccentColor.R*255, Library.Scheme.AccentColor.G*255, Library.Scheme.AccentColor.B*255, Stat.Value)
+            UpdateText()
         end
 
         function Stat:SetValue(Value)
             Stat.Value = Value
-            Label.Text = string.format("%s: <font color=\"rgb(%d, %d, %d)\">%s</font>", Stat.Text, Library.Scheme.AccentColor.R*255, Library.Scheme.AccentColor.G*255, Library.Scheme.AccentColor.B*255, Stat.Value)
+            UpdateText()
         end
 
         function Stat:SetVisible(Visible)
@@ -4752,6 +4757,7 @@ do
             Groupbox:Resize()
         end
 
+        UpdateText()
         Groupbox:Resize()
         table.insert(Groupbox.Elements, Stat)
         Options[Idx] = Stat
@@ -4796,10 +4802,15 @@ do
         })
 
         local function UpdateHeight()
-            local TextSize = TextService:GetTextSize(Label.Text, Label.TextSize, Library.Scheme.Font, Vector2.new(Label.AbsoluteSize.X, 10000))
-            Holder.Size = UDim2.new(1, 0, 0, TextSize.Y)
-            Label.Size = UDim2.new(1, 0, 0, TextSize.Y)
-            Groupbox:Resize()
+            if not Label.Parent then return end
+            local Success, TextSize = pcall(function()
+                return TextService:GetTextSize(Label.Text, Label.TextSize, Library.Scheme.Font.Font, Vector2.new(Label.AbsoluteSize.X, 10000))
+            end)
+            if Success and TextSize then
+                Holder.Size = UDim2.new(1, 0, 0, TextSize.Y)
+                Label.Size = UDim2.new(1, 0, 0, TextSize.Y)
+                Groupbox:Resize()
+            end
         end
 
         Label:GetPropertyChangedSignal("AbsoluteSize"):Connect(UpdateHeight)
@@ -4816,7 +4827,10 @@ do
             Groupbox:Resize()
         end
 
-        task.spawn(UpdateHeight)
+        task.spawn(function()
+            task.wait()
+            UpdateHeight()
+        end)
         table.insert(Groupbox.Elements, Paragraph)
         Options[Idx] = Paragraph
 
@@ -4979,7 +4993,8 @@ do
                     if Button.Disabled then return end
                     if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
                         local Pos = input.Position
-                        local RelativePos = Pos - Button.Base.AbsolutePosition
+                        local AbsPos = Button.Base.AbsolutePosition
+                        local RelativePos = Vector2.new(Pos.X - AbsPos.X, Pos.Y - AbsPos.Y)
                         
                         if Button.Glass then
                             Button.Glass.Position = UDim2.fromOffset(RelativePos.X - Button.Glass.AbsoluteSize.X/2, RelativePos.Y - Button.Glass.AbsoluteSize.Y/2)
@@ -8017,7 +8032,9 @@ do
         setmetatable(Depbox, BaseGroupbox)
 
         table.insert(Groupbox.DependencyBoxes, Depbox)
-        table.insert(Library.DependencyBoxes, Depbox)
+        if Library.DependencyBoxes then
+            table.insert(Library.DependencyBoxes, Depbox)
+        end
 
         function Depbox:Destroy()
             Depbox.Destroyed = true
@@ -8166,7 +8183,9 @@ do
         setmetatable(DepGroupbox, BaseGroupbox)
 
         table.insert(Tab.DependencyGroupboxes, DepGroupbox)
-        table.insert(Library.DependencyBoxes, DepGroupbox :: any)
+        if Library.DependencyBoxes then
+            table.insert(Library.DependencyBoxes, DepGroupbox :: any)
+        end
 
         function DepGroupbox:Destroy()
             DepGroupbox.Destroyed = true
