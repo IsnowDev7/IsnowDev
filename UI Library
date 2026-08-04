@@ -1,12 +1,3 @@
---[[
-	╔════════════════════════════════════════════════════════════════════════════╗
-	║               WINDOBS IDIAN - PROFESSIONAL ROBLOX UI LIBRARY               ║
-	║                         COMPLETE EDITION - v2.0                            ║
-	║                        Single File | 11k+ Lines                            ║
-	║                    Combined Wind UI & Obsidian UI                          ║
-	╚════════════════════════════════════════════════════════════════════════════╝
-]]
-
 local cloneref = cloneref or function(obj) return obj end
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
