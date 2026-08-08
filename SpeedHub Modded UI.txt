@@ -1,6 +1,6 @@
 -- SpeedHub Modded UI Library v2.0
 -- Adds dismissible notifications, hold-to-confirm actions, rounded top-bar buttons,
--- collapsible sections, custom labels, Mac-style controls, dialogs, and image-link support.
+-- collapsible sections, custom labels, right-middle display features and collapsible sections.
 
 local Kairo = {}
 
@@ -1089,31 +1089,6 @@ function Kairo:CreateWindow(config)
     MaxIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     MaxIcon.Size = UDim2.new(1, -8, 1, -8)
     MaxIcon.Parent = MaxRestore
-
-    -- Optional macOS-style traffic-light controls. The controls remain TextButtons
-    -- so the existing window behavior and animations are preserved.
-    if config.Mac == true then
-        CloseIcon.Visible = false
-        MinIcon.Visible = false
-        MaxIcon.Visible = false
-        Close.Text = "×"
-        Min.Text = "−"
-        MaxRestore.Text = "+"
-        for _, control in ipairs({Close, Min, MaxRestore}) do
-            control.TextSize = 17
-            control.Font = Enum.Font.GothamBold
-            control.TextColor3 = Color3.fromRGB(20, 20, 20)
-            control.BackgroundTransparency = 0
-            control.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            local trafficCorner = Instance.new("UICorner")
-            trafficCorner.CornerRadius = UDim.new(1, 0)
-            trafficCorner.Parent = control
-        end
-        Close.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
-        Min.BackgroundColor3 = Color3.fromRGB(255, 189, 46)
-        MaxRestore.BackgroundColor3 = Color3.fromRGB(39, 201, 63)
-    end
-
     local ResizeHandle = nil
     if Resizable then
         ResizeHandle = Instance.new("TextButton")
@@ -2882,7 +2857,8 @@ function Kairo:CreateWindow(config)
 
         local ImageDisplay = Instance.new("ImageLabel")
         -- Accepts rbxassetid://..., asset IDs, or a JPG/PNG URL string. Roblox may require external images to be uploaded first.
-        ImageDisplay.Image = tostring(imageId or "rbxassetid://0")
+        local imageSource = tostring(imageId or "rbxassetid://0")
+        ImageDisplay.Image = imageSource:match("^https?://") or imageSource:match("^rbxassetid://") and imageSource or "rbxassetid://" .. imageSource
         ImageDisplay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         ImageDisplay.BackgroundTransparency = 0.999
         ImageDisplay.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -2924,7 +2900,8 @@ function Kairo:CreateWindow(config)
         }
 
         function imageBoxFunc:SetImage(newImageId)
-            ImageDisplay.Image = newImageId
+            local imageSource = tostring(newImageId or "")
+            ImageDisplay.Image = imageSource:match("^https?://") or imageSource:match("^rbxassetid://") and imageSource or "rbxassetid://" .. imageSource
             imageBoxFunc.ImageId = newImageId
         end
 
@@ -4117,147 +4094,6 @@ function Kairo:CreateWindow(config)
         return imageSource
     end
 
-    local function MakeNotifyV2(notifyConfig)
-        notifyConfig = notifyConfig or {}
-        local title = notifyConfig.Title or "Notification"
-        local description = notifyConfig.Description or "Description"
-        local content = notifyConfig.Content or "Content"
-        local accent = notifyConfig.Color or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
-        local duration = tonumber(notifyConfig.Time) or 0.24
-        local autoClose = notifyConfig.AutoClose ~= false
-        local delayTime = tonumber(notifyConfig.Delay) or 5
-        local okayText = notifyConfig.OkayText or "Okay"
-        local dismissText = notifyConfig.DismissText or "Dismiss"
-        local closed = false
-
-        local gui = CoreGui:FindFirstChild("SpeedHubNotifyV2")
-        if not gui then
-            gui = Instance.new("ScreenGui")
-            gui.Name = "SpeedHubNotifyV2"
-            gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-            gui.Parent = CoreGui
-        end
-        local layout = gui:FindFirstChild("Layout")
-        if not layout then
-            layout = Instance.new("Frame")
-            layout.Name = "Layout"
-            layout.AnchorPoint = Vector2.new(1, 1)
-            layout.Position = UDim2.new(1, -30, 1, -30)
-            layout.Size = UDim2.fromOffset(360, 1)
-            layout.AutomaticSize = Enum.AutomaticSize.Y
-            layout.BackgroundTransparency = 1
-            layout.Parent = gui
-            local list = Instance.new("UIListLayout")
-            list.FillDirection = Enum.FillDirection.Vertical
-            list.HorizontalAlignment = Enum.HorizontalAlignment.Right
-            list.VerticalAlignment = Enum.VerticalAlignment.Bottom
-            list.Padding = UDim.new(0, 10)
-            list.SortOrder = Enum.SortOrder.LayoutOrder
-            list.Parent = layout
-        end
-
-        local frame = Instance.new("Frame")
-        frame.Name = "Notification"
-        frame.Size = UDim2.fromOffset(350, 0)
-        frame.AutomaticSize = Enum.AutomaticSize.Y
-        frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        frame.BackgroundTransparency = 0.08
-        frame.BorderSizePixel = 0
-        frame.Parent = layout
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 8)
-        corner.Parent = frame
-        local stroke = Instance.new("UIStroke")
-        stroke.Color = accent
-        stroke.Thickness = 1.2
-        stroke.Transparency = 0.2
-        stroke.Parent = frame
-        local padding = Instance.new("UIPadding")
-        padding.PaddingTop = UDim.new(0, 10)
-        padding.PaddingBottom = UDim.new(0, 10)
-        padding.PaddingLeft = UDim.new(0, 12)
-        padding.PaddingRight = UDim.new(0, 12)
-        padding.Parent = frame
-        local list = Instance.new("UIListLayout")
-        list.Padding = UDim.new(0, 5)
-        list.SortOrder = Enum.SortOrder.LayoutOrder
-        list.Parent = frame
-
-        local function label(name, text, size, color, font)
-            local object = Instance.new("TextLabel")
-            object.Name = name
-            object.BackgroundTransparency = 1
-            object.Size = UDim2.new(1, 0, 0, size + 4)
-            object.AutomaticSize = Enum.AutomaticSize.Y
-            object.Text = text
-            object.TextColor3 = color
-            object.TextSize = size
-            object.Font = font or Enum.Font.GothamBold
-            object.TextWrapped = true
-            object.TextXAlignment = Enum.TextXAlignment.Left
-            object.TextYAlignment = Enum.TextYAlignment.Center
-            object.Parent = frame
-            return object
-        end
-        label("Title", title, 14, Color3.fromRGB(255, 255, 255))
-        label("Description", description, 13, accent)
-        label("Content", content, 12, Color3.fromRGB(170, 170, 170), Enum.Font.Gotham)
-
-        local actions = Instance.new("Frame")
-        actions.Name = "Actions"
-        actions.BackgroundTransparency = 1
-        actions.Size = UDim2.new(1, 0, 0, 30)
-        actions.Parent = frame
-        local actionLayout = Instance.new("UIListLayout")
-        actionLayout.FillDirection = Enum.FillDirection.Horizontal
-        actionLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-        actionLayout.Padding = UDim.new(0, 7)
-        actionLayout.Parent = actions
-
-        local function actionButton(name, text, color)
-            local button = Instance.new("TextButton")
-            button.Name = name
-            button.Size = UDim2.fromOffset(90, 28)
-            button.BackgroundColor3 = color
-            button.BackgroundTransparency = 0.12
-            button.BorderSizePixel = 0
-            button.Text = text
-            button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            button.TextSize = 12
-            button.Font = Enum.Font.GothamBold
-            button.AutoButtonColor = true
-            button.Parent = actions
-            local c = Instance.new("UICorner")
-            c.CornerRadius = UDim.new(0, 5)
-            c.Parent = button
-            return button
-        end
-        local okay = actionButton("Okay", okayText, Color3.fromRGB(35, 170, 85))
-        local dismiss = actionButton("Dismiss", dismissText, Color3.fromRGB(190, 55, 55))
-
-        local api = {}
-        function api:Close()
-            if closed then return false end
-            closed = true
-            local tween = TweenService:Create(frame, TweenInfo.new(duration, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = UDim2.new(1, 30, 0, 0), BackgroundTransparency = 1})
-            tween:Play()
-            task.delay(duration, function() if frame.Parent then frame:Destroy() end end)
-            return true
-        end
-        okay.Activated:Connect(function()
-            if notifyConfig.OnOkay then notifyConfig.OnOkay(api) end
-            api:Close()
-        end)
-        dismiss.Activated:Connect(function()
-            if notifyConfig.OnDismiss then notifyConfig.OnDismiss(api) end
-            api:Close()
-        end)
-        if autoClose then task.delay(delayTime, function() if not closed then api:Close() end end) end
-        frame.Position = UDim2.new(1, 30, 0, 0)
-        TweenService:Create(frame, TweenInfo.new(duration, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
-        return api
-    end
-
     local function CreateHoldButton(tabContainer, title, content, iconId, holdTime, callback, options)
         options = options or {}
         holdTime = math.max(0.25, tonumber(holdTime) or 1.2)
@@ -4360,165 +4196,76 @@ function Kairo:CreateWindow(config)
         return body, section
     end
 
-    local function CreateStyledLabel(tabContainer, textValue, options)
-        options = options or {}
-        local label = Instance.new("TextLabel")
-        label.Name = options.Name or "CustomLabel"
-        label.BackgroundTransparency = options.BackgroundTransparency or 1
-        label.Size = UDim2.new(1, 0, 0, options.Height or 24)
-        label.Text = textValue or "Label"
-        label.TextColor3 = options.Color or Color3.fromRGB(230, 230, 230)
-        label.TextSize = options.TextSize or 13
-        label.Font = options.Font or Enum.Font.GothamBold
-        label.TextWrapped = options.Wrapped ~= false
-        label.TextXAlignment = options.TextXAlignment or Enum.TextXAlignment.Left
-        label.Parent = tabContainer
-        return label
-    end
-
-    local function CreateDialog(dialogConfig)
-        dialogConfig = dialogConfig or {}
-        local overlay = Instance.new("Frame")
-        overlay.Name = "DialogOverlay"
-        overlay.Size = UDim2.fromScale(1, 1)
-        overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        overlay.BackgroundTransparency = 0.45
-        overlay.ZIndex = 200
-        overlay.Parent = ScreenGui
-        local dialog = Instance.new("Frame")
-        dialog.Name = "Dialog"
-        dialog.AnchorPoint = Vector2.new(0.5, 0.5)
-        dialog.Position = UDim2.fromScale(0.5, 0.5)
-        dialog.Size = UDim2.fromOffset(360, 180)
-        dialog.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-        dialog.BackgroundTransparency = 0.05
-        dialog.BorderSizePixel = 0
-        dialog.ZIndex = 201
-        dialog.Parent = overlay
-        local dc = Instance.new("UICorner")
-        dc.CornerRadius = UDim.new(0, 8)
-        dc.Parent = dialog
-        local ds = Instance.new("UIStroke")
-        ds.Color = ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
-        ds.Thickness = 1.5
-        ds.Parent = dialog
-        local title = Instance.new("TextLabel")
-        title.BackgroundTransparency = 1
-        title.Position = UDim2.fromOffset(15, 12)
-        title.Size = UDim2.new(1, -30, 0, 24)
-        title.Text = dialogConfig.Title or "warning"
-        title.TextColor3 = dialogConfig.TitleColor or Color3.fromRGB(255, 255, 255)
-        title.TextSize = 16
-        title.Font = dialogConfig.Font or Enum.Font.GothamBold
-        title.TextXAlignment = Enum.TextXAlignment.Left
-        title.ZIndex = 202
-        title.Parent = dialog
-        local message = Instance.new("TextLabel")
-        message.BackgroundTransparency = 1
-        message.Position = UDim2.fromOffset(15, 45)
-        message.Size = UDim2.new(1, -30, 0, 45)
-        message.Text = dialogConfig.Content or "Are you sure you wanna do this"
-        message.TextColor3 = Color3.fromRGB(190, 190, 190)
-        message.TextSize = 13
-        message.Font = dialogConfig.Font or Enum.Font.Gotham
-        message.TextWrapped = true
-        message.TextXAlignment = Enum.TextXAlignment.Left
-        message.ZIndex = 202
-        message.Parent = dialog
-        local function makeAction(name, textValue, color, x)
-            local b = Instance.new("TextButton")
-            b.Name = name
-            b.Position = UDim2.new(0, x, 1, -45)
-            b.Size = UDim2.fromOffset(155, 30)
-            b.BackgroundColor3 = color
-            b.BorderSizePixel = 0
-            b.Text = textValue
-            b.TextColor3 = Color3.fromRGB(255, 255, 255)
-            b.TextSize = 12
-            b.Font = Enum.Font.GothamBold
-            b.ZIndex = 202
-            b.Parent = dialog
-            local c = Instance.new("UICorner")
-            c.CornerRadius = UDim.new(0, 5)
-            c.Parent = b
-            return b
+    local function CreateDisplayFeature(displayConfig)
+        displayConfig = displayConfig or {}
+        local displayGui = ScreenGui:FindFirstChild("DisplayFeatureGui")
+        if not displayGui then
+            displayGui = Instance.new("Frame")
+            displayGui.Name = "DisplayFeatureGui"
+            displayGui.AnchorPoint = Vector2.new(1, 0.5)
+            displayGui.Position = UDim2.new(1, -18, 0.5, 0)
+            displayGui.Size = UDim2.fromOffset(displayConfig.Width or 170, displayConfig.Height or 70)
+            displayGui.BackgroundColor3 = displayConfig.Color or Color3.fromRGB(15, 15, 15)
+            displayGui.BackgroundTransparency = displayConfig.Transparency or 0.08
+            displayGui.BorderSizePixel = 0
+            displayGui.Visible = false
+            displayGui.ZIndex = 120
+            displayGui.Parent = ScreenGui
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 6)
+            corner.Parent = displayGui
+            local stroke = Instance.new("UIStroke")
+            stroke.Color = displayConfig.StrokeColor or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
+            stroke.Thickness = 1
+            stroke.Parent = displayGui
+            local image = Instance.new("ImageLabel")
+            image.Name = "Image"
+            image.BackgroundTransparency = 1
+            image.Position = UDim2.fromOffset(8, 8)
+            image.Size = UDim2.fromOffset(54, 54)
+            image.ScaleType = Enum.ScaleType.Fit
+            local displayImageSource = tostring(displayConfig.Image or displayConfig.ImageId or "")
+            image.Image = displayImageSource:match("^https?://") or displayImageSource:match("^rbxassetid://") and displayImageSource or "rbxassetid://" .. displayImageSource
+            image.ZIndex = 121
+            image.Parent = displayGui
+            local label = Instance.new("TextLabel")
+            label.Name = "Label"
+            label.BackgroundTransparency = 1
+            label.Position = UDim2.fromOffset(70, 8)
+            label.Size = UDim2.new(1, -78, 1, -16)
+            label.Text = displayConfig.Text or displayConfig.Label or "Display"
+            label.TextColor3 = displayConfig.TextColor or Color3.fromRGB(255, 255, 255)
+            label.TextSize = displayConfig.TextSize or 12
+            label.Font = displayConfig.Font or Enum.Font.GothamBold
+            label.TextWrapped = true
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.TextYAlignment = Enum.TextYAlignment.Center
+            label.ZIndex = 121
+            label.Parent = displayGui
         end
-        local yes = makeAction("Yes", dialogConfig.YesText or "Yes", Color3.fromRGB(35, 170, 85), 15)
-        local no = makeAction("No", dialogConfig.NoText or "No", Color3.fromRGB(190, 55, 55), 190)
         local api = {}
-        function api:Close() if overlay.Parent then overlay:Destroy() end end
-        yes.Activated:Connect(function() if dialogConfig.OnYes then dialogConfig.OnYes(api) end end)
-        no.Activated:Connect(function() if dialogConfig.OnNo then dialogConfig.OnNo(api) end api:Close() end)
-        if dialogConfig.HoldToProceed then
-            yes.Text = dialogConfig.HoldName or "Proceed No Returning"
-            yes.Text = "Hold: " .. yes.Text
-            local held = false
-            local started = 0
-            yes.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    held, started = true, os.clock()
-                    task.delay(tonumber(dialogConfig.HoldTime) or 1.5, function()
-                        if held and os.clock() - started >= (tonumber(dialogConfig.HoldTime) or 1.5) then
-                            if dialogConfig.OnYes then dialogConfig.OnYes(api) end
-                            api:Close()
-                            held = false
-                        end
-                    end)
-                end
-            end)
-            yes.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then held = false end
-            end)
+        local function setVisible(value)
+            if displayGui.Visible == value then return end
+            if value then
+                displayGui.Visible = true
+                displayGui.Position = UDim2.new(1, 25, 0.5, 0)
+                TweenService:Create(displayGui, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1, -18, 0.5, 0)}):Play()
+            else
+                local tween = TweenService:Create(displayGui, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, 25, 0.5, 0)})
+                tween.Completed:Connect(function() displayGui.Visible = false end)
+                tween:Play()
+            end
         end
+        function api:Show() setVisible(true) end
+        function api:Hide() setVisible(false) end
+        function api:Toggle() setVisible(not displayGui.Visible) end
+        function api:SetText(value) displayGui.Label.Text = tostring(value) end
+        function api:SetImage(value)             local imageSource = tostring(value or "")
+            displayGui.Image.Image = imageSource:match("^https?://") or imageSource:match("^rbxassetid://") and imageSource or "rbxassetid://" .. imageSource end
+        function api:SetColor(value) displayGui.BackgroundColor3 = value end
+        function api:SetVisible(value) setVisible(value == true) end
+        api.Frame = displayGui
         return api
-    end
-
-    if type(config.TopBarButton) == "table" then
-        local topConfig = config.TopBarButton
-        local topButton = Instance.new("TextButton")
-        topButton.Name = "TopBarButton"
-        topButton.AnchorPoint = Vector2.new(0.5, 0)
-        topButton.Position = UDim2.new(0.5, 0, 0, tonumber(topConfig.Y) or 12)
-        topButton.Size = UDim2.fromOffset(tonumber(topConfig.Width) or 220, tonumber(topConfig.Height) or 40)
-        topButton.BackgroundColor3 = topConfig.Color or Color3.fromRGB(20, 20, 20)
-        topButton.BackgroundTransparency = topConfig.Transparency or 0.05
-        topButton.BorderSizePixel = 0
-        topButton.Text = ""
-        topButton.ZIndex = 150
-        topButton.Parent = ScreenGui
-        local topCorner = Instance.new("UICorner")
-        topCorner.CornerRadius = UDim.new(0, tonumber(topConfig.CornerRadius) or 40)
-        topCorner.Parent = topButton
-        local topStroke = Instance.new("UIStroke")
-        topStroke.Color = topConfig.StrokeColor or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
-        topStroke.Thickness = tonumber(topConfig.StrokeThickness) or 1
-        topStroke.Parent = topButton
-        local topLogo = Instance.new("ImageLabel")
-        topLogo.Name = "Logo"
-        topLogo.BackgroundTransparency = 1
-        topLogo.Position = UDim2.fromOffset(8, 5)
-        topLogo.Size = UDim2.fromOffset(30, 30)
-        topLogo.Image = NormalizeImageSource(topConfig.Image or topConfig.Logo)
-        topLogo.ScaleType = Enum.ScaleType.Fit
-        topLogo.ZIndex = 151
-        topLogo.Parent = topButton
-        local topText = Instance.new("TextLabel")
-        topText.Name = "Text"
-        topText.BackgroundTransparency = 1
-        topText.Position = UDim2.fromOffset(45, 0)
-        topText.Size = UDim2.new(1, -55, 1, 0)
-        topText.Text = topConfig.Text or Title
-        topText.TextColor3 = topConfig.TextColor or Color3.fromRGB(255, 255, 255)
-        topText.TextSize = tonumber(topConfig.TextSize) or 13
-        topText.Font = topConfig.Font or Enum.Font.GothamBold
-        topText.TextXAlignment = Enum.TextXAlignment.Left
-        topText.ZIndex = 151
-        topText.Parent = topButton
-        topButton.Activated:Connect(function()
-            CircleClick(topButton, Mouse.X, Mouse.Y)
-            if topConfig.Callback then topConfig.Callback(WindowVisible) end
-            SetWindowVisible(not WindowVisible)
-        end)
     end
 
     -- Window Methods
@@ -4568,20 +4315,18 @@ function Kairo:CreateWindow(config)
         return CreateHoldButton(tabContainer, title, content, iconId, holdTime, callback, options)
     end
 
+    function Window:AddDisplayFeature(displayConfig)
+        return CreateDisplayFeature(displayConfig)
+    end
+
     function Window:AddSection(tabContainer, title, defaultOpen)
         return CreateSection(tabContainer, title, defaultOpen)
     end
 
-    function Window:AddLabel(tabContainer, textValue, options)
-        return CreateStyledLabel(tabContainer, textValue, options)
-    end
-
-    function Window:AddDialog(dialogConfig)
-        return CreateDialog(dialogConfig)
-    end
-
-    function Window:NotifyV2(notifyConfig)
-        return MakeNotifyV2(notifyConfig)
+    function Window:AddToSection(sectionBody, creatorName, ...)
+        assert(typeof(sectionBody) == "Instance" and sectionBody:IsA("Frame"), "sectionBody must be the Body returned by AddSection")
+        assert(type(self[creatorName]) == "function", "Unknown control creator: " .. tostring(creatorName))
+        return self[creatorName](self, sectionBody, ...)
     end
     
     function Window:AddToggle(tabContainer, title, content, defaultValue, callback, elementId)
