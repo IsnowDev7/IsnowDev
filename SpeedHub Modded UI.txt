@@ -1037,14 +1037,16 @@ function Kairo:CreateWindow(config)
 
     TitleLabel:GetPropertyChangedSignal("TextBounds"):Connect(UpdateBadgePosition)
 
-    for _, badgeText in ipairs(Badges) do
+    for _, badgeValue in ipairs(Badges) do
+        local badgeText = type(badgeValue) == "table" and (badgeValue.Text or badgeValue.Name or "") or tostring(badgeValue)
+        local badgeColor = type(badgeValue) == "table" and badgeValue.Color or nil
         local Badge = Instance.new("TextLabel")
         Badge.Name = "Badge"
-        Badge.Font = Enum.Font.GothamBold
-        Badge.Text = badgeText
+        Badge.Font = ResolveFont(WindowFont, Enum.Font.GothamBold)
+        Badge.Text = tostring(badgeText)
         Badge.TextColor3 = Color3.fromRGB(255, 255, 255)
         Badge.TextSize = 10
-        Badge.BackgroundColor3 = ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
+        Badge.BackgroundColor3 = badgeColor or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
         Badge.BackgroundTransparency = 0.3
         Badge.BorderSizePixel = 0
         Badge.Size =
