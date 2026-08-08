@@ -1042,7 +1042,7 @@ function Kairo:CreateWindow(config)
         local badgeColor = type(badgeValue) == "table" and badgeValue.Color or nil
         local Badge = Instance.new("TextLabel")
         Badge.Name = "Badge"
-        Badge.Font = ResolveFont(WindowFont, Enum.Font.GothamBold)
+        Badge.Font = Enum.Font.GothamBold
         Badge.Text = tostring(badgeText)
         Badge.TextColor3 = Color3.fromRGB(255, 255, 255)
         Badge.TextSize = 10
