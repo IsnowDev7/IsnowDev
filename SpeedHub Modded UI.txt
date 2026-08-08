@@ -335,6 +335,11 @@ local ConfigSystem = {
         ["Amber"] = Color3.fromRGB(255, 150, 0),
         ["Neon"] = Color3.fromRGB(0, 255, 200),
         ["Royal"] = Color3.fromRGB(100, 0, 200)
+        , ["Carbon"] = Color3.fromRGB(92, 104, 118)
+        , ["Arctic"] = Color3.fromRGB(115, 205, 255)
+        , ["RoseGold"] = Color3.fromRGB(220, 125, 145)
+        , ["Graphite"] = Color3.fromRGB(135, 145, 158)
+        , ["Violet"] = Color3.fromRGB(150, 95, 235)
     },
     CurrentTheme = "Default",
     ThemeElements = {},
@@ -879,6 +884,11 @@ function Kairo:CreateWindow(config)
     local MinimizeButtonImage = config.MinimizeButton_Image or "rbxassetid://16932740082"
     local Badges = config.Badges or {}
     local ConfigData = config.Config or {}
+    local Acrylic = config.Acrylic == true
+    local Glow = config.Glow == true
+    local WindowColor = config.Color
+    local SideBarWidth = math.max(88, tonumber(config.SideBarWidth) or 120)
+    local WindowFont = config.Font
     local Animation = config.Animation ~= false
     local User = config.User or {Enabled = false, Anonymous = false}
     if type(User) == "boolean" then
@@ -924,8 +934,8 @@ function Kairo:CreateWindow(config)
 
     local Main = Instance.new("Frame")
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
-    Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    Main.BackgroundTransparency = 0.1
+    Main.BackgroundColor3 = typeof(WindowColor) == "Color3" and WindowColor or Color3.fromRGB(15, 15, 15)
+    Main.BackgroundTransparency = Acrylic and 0.22 or 0.1
     Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
     Main.BorderSizePixel = 0
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -937,9 +947,28 @@ function Kairo:CreateWindow(config)
     UICorner.Parent = Main
 
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Color = Color3.fromRGB(50, 50, 50)
-    UIStroke.Thickness = 1.6
+    UIStroke.Color = ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
+    UIStroke.Thickness = Acrylic and 2 or 1.6
+    UIStroke.Transparency = Acrylic and 0.18 or 0
     UIStroke.Parent = Main
+
+    local GlowStroke
+    if Glow then
+        GlowStroke = Instance.new("UIStroke")
+        GlowStroke.Name = "GlowStroke"
+        GlowStroke.Color = ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
+        GlowStroke.Thickness = 2
+        GlowStroke.Transparency = 0.25
+        GlowStroke.Parent = Main
+        task.spawn(function()
+            while GlowStroke and GlowStroke.Parent do
+                local pulse = (math.sin(os.clock() * 2.2) + 1) * 0.5
+                GlowStroke.Transparency = 0.16 + pulse * 0.34
+                GlowStroke.Thickness = 1.5 + pulse * 1.5
+                task.wait(0.05)
+            end
+        end)
+    end
 
     local Top = Instance.new("Frame")
     Top.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -1163,7 +1192,7 @@ function Kairo:CreateWindow(config)
     TabFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     TabFrame.BorderSizePixel = 0
     TabFrame.Position = UDim2.new(0, 9, 0, ContentTopOffset)
-    TabFrame.Size = UDim2.new(0, 120, 1, -ContentBottomOffset)
+    TabFrame.Size = UDim2.new(0, SideBarWidth, 1, -ContentBottomOffset)
     TabFrame.Name = "TabFrame"
     TabFrame.Parent = Main
 
@@ -1272,8 +1301,8 @@ function Kairo:CreateWindow(config)
     ContentFrame.BackgroundTransparency = 0.999
     ContentFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     ContentFrame.BorderSizePixel = 0
-    ContentFrame.Position = UDim2.new(0, 138, 0, ContentTopOffset)
-    ContentFrame.Size = UDim2.new(1, -147, 1, -ContentBottomOffset)
+    ContentFrame.Position = UDim2.new(0, SideBarWidth + 18, 0, ContentTopOffset)
+    ContentFrame.Size = UDim2.new(1, -(SideBarWidth + 27), 1, -ContentBottomOffset)
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = Main
 
@@ -1478,6 +1507,13 @@ function Kairo:CreateWindow(config)
         )
     end
 
+
+    local function ResolveFont(fontValue, fallback)
+        if typeof(fontValue) == "EnumItem" and fontValue.EnumType == Enum.Font then return fontValue end
+        if type(fontValue) == "string" and Enum.Font[fontValue] then return Enum.Font[fontValue] end
+        return fallback or Enum.Font.Gotham
+    end
+
     -- Element Creation Functions
     local function CreateParagraph(tabContainer, title, content, customContent)
         if not tabContainer or not tabContainer:IsA("Frame") then
@@ -1499,7 +1535,7 @@ function Kairo:CreateWindow(config)
         ParagraphCorner.Parent = Paragraph
 
         local ParagraphTitle = Instance.new("TextLabel")
-        ParagraphTitle.Font = Enum.Font.GothamBold
+        ParagraphTitle.Font = ResolveFont(WindowFont, Enum.Font.GothamBold)
         ParagraphTitle.Text = title or "Paragraph"
         ParagraphTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
         ParagraphTitle.TextSize = 13
@@ -1603,7 +1639,7 @@ function Kairo:CreateWindow(config)
         ButtonCorner.Parent = Button
 
         local ButtonTitle = Instance.new("TextLabel")
-        ButtonTitle.Font = Enum.Font.GothamBold
+        ButtonTitle.Font = ResolveFont(WindowFont, Enum.Font.GothamBold)
         ButtonTitle.Text = title
         ButtonTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
         ButtonTitle.TextSize = 13
@@ -1716,7 +1752,7 @@ function Kairo:CreateWindow(config)
         ToggleCorner.Parent = Toggle
 
         local ToggleTitle = Instance.new("TextLabel")
-        ToggleTitle.Font = Enum.Font.GothamBold
+        ToggleTitle.Font = ResolveFont(WindowFont, Enum.Font.GothamBold)
         ToggleTitle.Text = title
         ToggleTitle.TextSize = 13
         ToggleTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
@@ -2489,7 +2525,8 @@ function Kairo:CreateWindow(config)
             Value = dropdownData.Value,
             Options = dropdownData.Options,
             Type = "Dropdown",
-            Id = elementId
+            Id = elementId,
+            Frame = Dropdown
         }
 
         function dropdownFunc:Set(value)
@@ -2925,8 +2962,8 @@ function Kairo:CreateWindow(config)
 
         local ImageDisplay = Instance.new("ImageLabel")
         -- Accepts rbxassetid://..., asset IDs, or a JPG/PNG URL string. Roblox may require external images to be uploaded first.
-        local imageSource = tostring(imageId or "rbxassetid://0")
-        ImageDisplay.Image = imageSource:match("^https?://") or imageSource:match("^rbxassetid://") and imageSource or "rbxassetid://" .. imageSource
+        local imageSource = NormalizeImageSource(imageId or "rbxassetid://0")
+        ImageDisplay.Image = imageSource
         ImageDisplay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         ImageDisplay.BackgroundTransparency = 0.999
         ImageDisplay.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -2968,8 +3005,8 @@ function Kairo:CreateWindow(config)
         }
 
         function imageBoxFunc:SetImage(newImageId)
-            local imageSource = tostring(newImageId or "")
-            ImageDisplay.Image = imageSource:match("^https?://") or imageSource:match("^rbxassetid://") and imageSource or "rbxassetid://" .. imageSource
+            local imageSource = NormalizeImageSource(newImageId)
+            ImageDisplay.Image = imageSource
             imageBoxFunc.ImageId = newImageId
         end
 
@@ -4158,14 +4195,14 @@ function Kairo:CreateWindow(config)
     -- ========================= SpeedHub v2 extensions =========================
 
     local function NormalizeImageSource(imageSource)
-        if imageSource == nil then
-            return ""
-        end
-        imageSource = tostring(imageSource)
-        -- Roblox normally accepts uploaded image assets in rbxassetid:// form.
-        -- http(s) links are accepted as input for compatibility, but Roblox may
-        -- reject external URLs unless the image is uploaded/imported as an asset.
-        return imageSource
+        if imageSource == nil then return "" end
+        local value = tostring(imageSource):gsub("^%s+", ""):gsub("%s+$", "")
+        if value == "" then return "" end
+        if value:match("^%d+$") then return "rbxassetid://" .. value end
+        if value:match("^rbxasset:%d+$") then return value:gsub("^rbxasset:", "rbxassetid://") end
+        if value:match("^rbxassetid://%d+$") then return value end
+        if value:match("^rbxasset://") or value:match("^https?://") then return value end
+        return value
     end
 
     local function CreateHoldButton(tabContainer, title, content, iconId, holdTime, callback, options)
@@ -4292,291 +4329,182 @@ function Kairo:CreateWindow(config)
         end)
     end
 
-    -- ========================= SpeedHub media and utility extensions =========================
 
-    local function NormalizeMediaSource(source)
-        if source == nil then return "" end
-        local value = tostring(source)
-        if value:match("^%d+$") then
-            return "rbxassetid://" .. value
+    -- ========================= SpeedHub expansion helpers =========================
+
+    local function ApplyGradient(target, firstColor, secondColor, rotation)
+        if not target or not target:IsA("GuiObject") then return end
+        local gradient = target:FindFirstChild("SpeedHubGradient")
+        if not gradient then
+            gradient = Instance.new("UIGradient")
+            gradient.Name = "SpeedHubGradient"
+            gradient.Parent = target
         end
-        return value
+        gradient.Color = ColorSequence.new(firstColor or Color3.fromRGB(255,255,255), secondColor or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme])
+        gradient.Rotation = rotation or 0
+        return gradient
     end
 
-    local function AddCorner(parent, radius)
+    local function AddTagToElement(element, tagName, tagColor)
+        if not element or not element:IsA("Frame") or tagName == nil or tostring(tagName) == "" then return end
+        local old = element:FindFirstChild("SpeedHubTag")
+        if old then old:Destroy() end
+        local tag = Instance.new("TextLabel")
+        tag.Name = "SpeedHubTag"
+        tag.AnchorPoint = Vector2.new(1, 0.5)
+        tag.Position = UDim2.new(1, -46, 0.5, 0)
+        tag.Size = UDim2.fromOffset(math.max(42, TextService:GetTextSize(tostring(tagName), 10, Enum.Font.GothamBold, Vector2.new(500, 20)).X + 18), 20)
+        tag.BackgroundColor3 = tagColor or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
+        tag.BackgroundTransparency = 0.08
+        tag.BorderSizePixel = 0
+        tag.Font = Enum.Font.GothamBold
+        tag.Text = tostring(tagName)
+        tag.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tag.TextSize = 10
+        tag.Parent = element
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, radius or 8)
-        corner.Parent = parent
-        return corner
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = tag
+        return tag
     end
 
-    local function AddPanelStroke(parent, color, transparency)
-        local stroke = Instance.new("UIStroke")
-        stroke.Color = color or Color3.fromRGB(255, 255, 255)
-        stroke.Transparency = transparency == nil and 0.82 or transparency
-        stroke.Thickness = 1
-        stroke.Parent = parent
-        return stroke
-    end
-
-    local function CreateMediaPanel(tabContainer, mediaConfig)
-        mediaConfig = mediaConfig or {}
-        local panel = Instance.new("Frame")
-        panel.Name = mediaConfig.Name or "MediaPanel"
-        panel.LayoutOrder = mediaConfig.LayoutOrder or -100
-        panel.Size = mediaConfig.Size or UDim2.new(1, 0, 0, 148)
-        panel.BackgroundColor3 = mediaConfig.BackgroundColor3 or Color3.fromRGB(25, 25, 25)
-        panel.BackgroundTransparency = mediaConfig.BackgroundTransparency or 0.08
-        panel.BorderSizePixel = 0
-        panel.ClipsDescendants = true
-        panel.Parent = tabContainer
-        AddCorner(panel, mediaConfig.CornerRadius or 8)
-        AddPanelStroke(panel, ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme], 0.8)
-
-        local media = Instance.new("ImageLabel")
-        media.Name = "Thumbnail"
-        media.BackgroundTransparency = 1
-        media.Position = UDim2.fromOffset(0, 0)
-        media.Size = UDim2.new(1, 0, 1, 0)
-        media.ScaleType = mediaConfig.ScaleType or Enum.ScaleType.Crop
-        media.Image = NormalizeMediaSource(mediaConfig.Image or mediaConfig.Thumbnail)
-        media.Parent = panel
-        AddCorner(media, mediaConfig.CornerRadius or 8)
-
-        local video = nil
-        local videoSource = mediaConfig.Video or mediaConfig.VideoSource
-        if videoSource and tostring(videoSource) ~= "" then
-            video = Instance.new("VideoFrame")
-            video.Name = "Video"
-            video.BackgroundTransparency = 1
-            video.Position = UDim2.fromOffset(0, 0)
-            video.Size = UDim2.new(1, 0, 1, 0)
-            video.Looped = mediaConfig.Looped ~= false
-            video.Volume = mediaConfig.Volume or 0
-            video.Video = NormalizeMediaSource(videoSource)
-            video.Visible = mediaConfig.AutoPlay == true or mediaConfig.Playing == true
-            video.Parent = panel
-            AddCorner(video, mediaConfig.CornerRadius or 8)
-            if video.Visible then pcall(function() video:Play() end) end
-        end
-
-        local shade = Instance.new("Frame")
-        shade.Name = "Shade"
-        shade.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        shade.BackgroundTransparency = mediaConfig.ShadeTransparency or 0.42
-        shade.BorderSizePixel = 0
-        shade.Size = UDim2.new(1, 0, 1, 0)
-        shade.Parent = panel
-
-        local title = Instance.new("TextLabel")
-        title.Name = "Title"
-        title.BackgroundTransparency = 1
-        title.Position = UDim2.fromOffset(14, 12)
-        title.Size = UDim2.new(1, -28, 0, 24)
-        title.Font = Enum.Font.GothamBold
-        title.Text = mediaConfig.Title or ""
-        title.TextColor3 = mediaConfig.TitleColor or Color3.fromRGB(255, 255, 255)
-        title.TextSize = mediaConfig.TitleSize or 17
-        title.TextXAlignment = Enum.TextXAlignment.Left
-        title.Parent = panel
-
-        local subtitle = Instance.new("TextLabel")
-        subtitle.Name = "Subtitle"
-        subtitle.BackgroundTransparency = 1
-        subtitle.Position = UDim2.fromOffset(14, 39)
-        subtitle.Size = UDim2.new(1, -28, 0, 34)
-        subtitle.Font = Enum.Font.Gotham
-        subtitle.Text = mediaConfig.Subtitle or mediaConfig.Description or ""
-        subtitle.TextColor3 = Color3.fromRGB(235, 235, 235)
-        subtitle.TextTransparency = 0.12
-        subtitle.TextSize = mediaConfig.SubtitleSize or 11
-        subtitle.TextWrapped = true
-        subtitle.TextXAlignment = Enum.TextXAlignment.Left
-        subtitle.Parent = panel
-
-        local api = {}
-        function api:SetImage(source)
-            media.Image = NormalizeMediaSource(source)
-        end
-        function api:SetVideo(source)
-            if not video then
-                video = Instance.new("VideoFrame")
-                video.Name = "Video"
-                video.BackgroundTransparency = 1
-                video.Size = UDim2.new(1, 0, 1, 0)
-                video.Looped = true
-                video.Volume = 0
-                video.Parent = panel
-                AddCorner(video, mediaConfig.CornerRadius or 8)
-            end
-            video.Video = NormalizeMediaSource(source)
-        end
-        function api:Play()
-            if video then video.Visible = true; pcall(function() video:Play() end) end
-        end
-        function api:Pause()
-            if video then pcall(function() video:Pause() end) end
-        end
-        function api:SetTitle(value) title.Text = tostring(value or "") end
-        function api:SetSubtitle(value) subtitle.Text = tostring(value or "") end
-        function api:GetFrame() return panel end
-        return api
-    end
-
-    local function CreateUserPanel(tabContainer, userConfig)
-        userConfig = userConfig or {}
-        local panel = Instance.new("Frame")
-        panel.Name = userConfig.Name or "UserPanel"
-        panel.LayoutOrder = userConfig.LayoutOrder or -90
-        panel.Size = userConfig.Size or UDim2.new(1, 0, 0, 82)
-        panel.BackgroundColor3 = userConfig.BackgroundColor3 or Color3.fromRGB(34, 34, 34)
-        panel.BackgroundTransparency = 0.08
-        panel.BorderSizePixel = 0
-        panel.Parent = tabContainer
-        AddCorner(panel, userConfig.CornerRadius or 10)
-        AddPanelStroke(panel, ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme], 0.8)
-
-        local avatar = Instance.new("ImageLabel")
-        avatar.Name = "Thumbnail"
-        avatar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        avatar.BackgroundTransparency = 0
-        avatar.BorderSizePixel = 0
-        avatar.Position = UDim2.fromOffset(12, 13)
-        avatar.Size = UDim2.fromOffset(56, 56)
-        avatar.Image = NormalizeMediaSource(userConfig.Thumbnail or userConfig.Avatar or "")
-        avatar.ScaleType = Enum.ScaleType.Crop
-        avatar.Parent = panel
-        AddCorner(avatar, 28)
-        AddPanelStroke(avatar, Color3.fromRGB(255, 255, 255), 0.35)
-
-        local status = Instance.new("Frame")
-        status.Name = "Status"
-        status.AnchorPoint = Vector2.new(1, 1)
-        status.Position = UDim2.new(0, 67, 0, 69)
-        status.Size = UDim2.fromOffset(14, 14)
-        status.BackgroundColor3 = userConfig.StatusColor or Color3.fromRGB(55, 210, 125)
-        status.BorderSizePixel = 0
-        status.Parent = panel
-        AddCorner(status, 7)
-        AddPanelStroke(status, Color3.fromRGB(20, 20, 20), 0.15)
-
-        local name = Instance.new("TextLabel")
-        name.Name = "Name"
-        name.BackgroundTransparency = 1
-        name.Position = UDim2.fromOffset(82, 14)
-        name.Size = UDim2.new(1, -94, 0, 22)
-        name.Font = Enum.Font.GothamBold
-        name.Text = userConfig.NameText or userConfig.Username or "User"
-        name.TextColor3 = Color3.fromRGB(255, 255, 255)
-        name.TextSize = 15
-        name.TextXAlignment = Enum.TextXAlignment.Left
-        name.Parent = panel
-
-        local info = Instance.new("TextLabel")
-        info.Name = "Info"
-        info.BackgroundTransparency = 1
-        info.Position = UDim2.fromOffset(82, 38)
-        info.Size = UDim2.new(1, -94, 0, 28)
-        info.Font = Enum.Font.Gotham
-        info.Text = userConfig.Info or userConfig.Status or "Online"
-        info.TextColor3 = Color3.fromRGB(210, 210, 210)
-        info.TextSize = 11
-        info.TextWrapped = true
-        info.TextXAlignment = Enum.TextXAlignment.Left
-        info.Parent = panel
-
-        local api = {}
-        function api:SetThumbnail(source) avatar.Image = NormalizeMediaSource(source) end
-        function api:SetName(value) name.Text = tostring(value or "") end
-        function api:SetInfo(value) info.Text = tostring(value or "") end
-        function api:SetStatusColor(color) status.BackgroundColor3 = color end
-        function api:GetFrame() return panel end
-        return api
-    end
-
-    local function CreateDraggableUI(statusConfig)
-        statusConfig = statusConfig or {}
-        local holder = Instance.new("Frame")
-        holder.Name = statusConfig.Name or "DraggableUI"
-        holder.Size = statusConfig.Size or UDim2.fromOffset(300, 42)
-        holder.Position = statusConfig.Position or UDim2.new(0.5, -150, 0, 24)
-        holder.BackgroundColor3 = statusConfig.BackgroundColor3 or Color3.fromRGB(12, 12, 12)
-        holder.BackgroundTransparency = statusConfig.BackgroundTransparency or 0.05
-        holder.BorderSizePixel = 0
-        holder.ZIndex = 200
-        holder.Parent = ScreenGui
-        AddCorner(holder, statusConfig.CornerRadius or 6)
-        AddPanelStroke(holder, statusConfig.StrokeColor or Color3.fromRGB(0, 0, 0), 0.05)
-
-        local label = Instance.new("TextLabel")
-        label.Name = "StatusLabel"
-        label.BackgroundTransparency = 1
-        label.Size = UDim2.new(1, -20, 1, 0)
-        label.Position = UDim2.fromOffset(10, 0)
-        label.Font = statusConfig.Font or Enum.Font.Code
-        label.TextColor3 = statusConfig.TextColor or Color3.fromRGB(245, 245, 245)
-        label.TextSize = statusConfig.TextSize or 16
-        label.Text = statusConfig.Text or "SpeedHub | 0 fps | 0 ms"
-        label.TextXAlignment = Enum.TextXAlignment.Center
-        label.Parent = holder
-
-        MakeDraggable(holder, holder)
-        local api = {}
-        function api:SetText(value) label.Text = tostring(value or "") end
-        function api:SetVisible(value) holder.Visible = value == true end
-        function api:GetFrame() return holder end
-        function api:Destroy() holder:Destroy() end
-        function api:StartTelemetry()
-            local frames = 0
-            local started = os.clock()
-            local connection
-            connection = RunService.RenderStepped:Connect(function(dt)
-                frames += 1
-                local elapsed = os.clock() - started
-                if elapsed >= 0.5 then
-                    local fps = math.floor(frames / elapsed + 0.5)
-                    local ms = math.floor((dt or 0) * 1000 + 0.5)
-                    label.Text = string.format(statusConfig.Format or "SpeedHub | %d fps | %d ms", fps, ms)
-                    frames = 0
-                    started = os.clock()
+    local function AddSearchToDropdown(dropdownFrame, dropdownObject, sourceOptions)
+        if not dropdownFrame or not dropdownObject then return end
+        local search = Instance.new("TextBox")
+        search.Name = "SearchBox"
+        search.ClearTextOnFocus = false
+        search.PlaceholderText = "Search..."
+        search.Text = ""
+        search.Font = Enum.Font.Gotham
+        search.TextSize = 11
+        search.TextColor3 = Color3.fromRGB(235, 235, 235)
+        search.PlaceholderColor3 = Color3.fromRGB(145, 145, 145)
+        search.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        search.BackgroundTransparency = 0.92
+        search.BorderSizePixel = 0
+        search.Position = UDim2.new(1, -156, 0, -34)
+        search.Size = UDim2.fromOffset(148, 26)
+        search.Visible = false
+        search.Parent = dropdownFrame
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 5)
+        corner.Parent = search
+        local function filter()
+            local query = string.lower(search.Text or "")
+            local filtered = {}
+            for _, option in ipairs(sourceOptions or {}) do
+                if query == "" or string.find(string.lower(tostring(option)), query, 1, true) then
+                    table.insert(filtered, option)
                 end
-            end)
-            api._connection = connection
-            return connection
+            end
+            if dropdownObject.Refresh then dropdownObject:Refresh(filtered) end
         end
-        return api
+        search:GetPropertyChangedSignal("Text"):Connect(filter)
+        return search
     end
 
-    local function CreateCopyButton(parent, value, copyConfig)
-        copyConfig = copyConfig or {}
-        local button = Instance.new("ImageButton")
-        button.Name = copyConfig.Name or "CopyButton"
-        button.BackgroundTransparency = 1
-        button.Size = copyConfig.Size or UDim2.fromOffset(24, 24)
-        button.Image = copyConfig.Icon or "rbxassetid://6031094671" -- Lucide-style copy icon asset
-        button.ImageColor3 = copyConfig.IconColor or Color3.fromRGB(230, 230, 230)
-        button.AutoButtonColor = false
+    local function CreateCheckBox(tabContainer, title, content, defaultValue, callback, elementId, options)
+        local frame = CreateToggle(tabContainer, title, content, defaultValue, callback, elementId)
+        if not frame then return end
+        frame.Name = "CheckBox"
+        local feature = frame:FindFirstChild("FeatureFrame")
+        local circle = frame:FindFirstChild("ToggleCircle")
+        if feature then
+            feature.Size = UDim2.fromOffset(22, 22)
+            feature.BackgroundTransparency = 0.78
+        end
+        if circle then
+            circle.Size = UDim2.fromOffset(14, 14)
+            local c = circle:FindFirstChildOfClass("UICorner")
+            if c then c.CornerRadius = UDim.new(0, 3) end
+        end
+        if options and options.Tag then AddTagToElement(frame, options.Tag, options.TagColor) end
+        if options and options.Gradient then ApplyGradient(frame, options.Gradient[1], options.Gradient[2], options.Gradient.Rotation) end
+        return frame
+    end
+
+    local function AddClipboardButton(parent, getValue, options)
+        options = options or {}
+        local button = Instance.new("TextButton")
+        button.Name = "CopyClipboardButton"
+        button.Size = options.Size or UDim2.fromOffset(28, 28)
+        button.Position = options.Position or UDim2.new(1, -36, 0, 8)
+        button.AnchorPoint = options.AnchorPoint or Vector2.new(0, 0)
+        button.BackgroundColor3 = options.BackgroundColor3 or Color3.fromRGB(255, 255, 255)
+        button.BackgroundTransparency = 0.9
+        button.BorderSizePixel = 0
+        button.Text = options.Text or "⧉"
+        button.TextColor3 = options.TextColor or Color3.fromRGB(235, 235, 235)
+        button.TextSize = options.TextSize or 16
+        button.Font = Enum.Font.GothamBold
+        button.AutoButtonColor = true
+        button.ZIndex = 20
         button.Parent = parent
-        local copied = false
+        local c = Instance.new("UICorner")
+        c.CornerRadius = UDim.new(0, 6)
+        c.Parent = button
         button.Activated:Connect(function()
-            local text = type(value) == "function" and value() or value
-            local ok = pcall(function()
-                if setclipboard then setclipboard(tostring(text)) else error("clipboard unavailable") end
+            local value = type(getValue) == "function" and getValue() or getValue
+            local copied = pcall(function()
+                if setclipboard then setclipboard(tostring(value)) else error("clipboard unavailable") end
             end)
-            copied = ok
-            if copyConfig.Callback then copyConfig.Callback(ok, text) end
-            if ok then
-                button.ImageColor3 = Color3.fromRGB(80, 220, 140)
-                task.delay(0.7, function() if button.Parent then button.ImageColor3 = copyConfig.IconColor or Color3.fromRGB(230, 230, 230) end end)
-            end
+            button.Text = copied and "✓" or "!"
+            task.delay(0.8, function() if button.Parent then button.Text = options.Text or "⧉" end end)
+            if options.Callback then options.Callback(copied, value) end
         end)
         return button
     end
 
-    local function CreateTabHero(tabContainer, heroConfig)
-        heroConfig = heroConfig or {}
-        heroConfig.LayoutOrder = heroConfig.LayoutOrder or -100
-        return CreateMediaPanel(tabContainer, heroConfig)
+    local function AddTabSearch()
+        local search = Instance.new("TextBox")
+        search.Name = "TabSearch"
+        search.ClearTextOnFocus = false
+        search.PlaceholderText = "Search tabs"
+        search.Text = ""
+        search.Font = Enum.Font.Gotham
+        search.TextSize = 11
+        search.TextColor3 = Color3.fromRGB(235, 235, 235)
+        search.PlaceholderColor3 = Color3.fromRGB(145, 145, 145)
+        search.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        search.BackgroundTransparency = 0.93
+        search.BorderSizePixel = 0
+        search.Position = UDim2.fromOffset(0, 0)
+        search.Size = UDim2.new(1, 0, 0, 30)
+        search.Parent = TabFrame
+        local c = Instance.new("UICorner")
+        c.CornerRadius = UDim.new(0, 6)
+        c.Parent = search
+        TabScroll.Position = UDim2.fromOffset(0, 36)
+        TabScroll.Size = UDim2.new(1, 0, 1, -36)
+        search:GetPropertyChangedSignal("Text"):Connect(function()
+            local q = string.lower(search.Text or "")
+            for _, child in ipairs(TabScroll:GetChildren()) do
+                if child:IsA("Frame") and child.Name == "Tab" then
+                    local label = child:FindFirstChild("TabName")
+                    child.Visible = q == "" or (label and string.find(string.lower(label.Text), q, 1, true) ~= nil)
+                end
+            end
+        end)
+        return search
+    end
+
+    AddTabSearch()
+
+    function Window:AddGradientColor(target, firstColor, secondColor, rotation)
+        return ApplyGradient(target, firstColor, secondColor, rotation)
+    end
+
+    function Window:AddTag(target, name, color)
+        return AddTagToElement(target, name, color)
+    end
+
+    function Window:AddClipboardButton(parent, value, options)
+        return AddClipboardButton(parent, value, options)
+    end
+
+    function Window:SetFont(fontValue)
+        WindowFont = fontValue
+        return ResolveFont(fontValue, Enum.Font.Gotham)
     end
 
     function Window:AddCodeWindow(tabContainer, title, code, animate)
@@ -4599,41 +4527,26 @@ function Kairo:CreateWindow(config)
         SetWindowVisible(false)
     end
     
-    function Window:AddVideo(tabContainer, title, content, videoSource, config)
-        config = config or {}
-        config.Title = title
-        config.Description = content
-        config.Video = videoSource
-        return CreateMediaPanel(tabContainer, config)
-    end
-
-    function Window:AddTabHero(tabContainer, config)
-        return CreateTabHero(tabContainer, config)
-    end
-
-    function Window:AddUserPanel(tabContainer, config)
-        return CreateUserPanel(tabContainer, config)
-    end
-
-    function Window:AddDraggableUI(config)
-        return CreateDraggableUI(config)
-    end
-
-    function Window:AddCopyButton(parent, value, config)
-        assert(typeof(parent) == "Instance", "parent must be an Instance")
-        return CreateCopyButton(parent, value, config)
-    end
-
     function Window:CreateTab(tabName, iconId)
         return CreateTabButton(tabName, iconId, false)
     end
     
-    function Window:AddParagraph(tabContainer, title, content, customContent)
-        return CreateParagraph(tabContainer, title, content, customContent)
+    function Window:AddParagraph(tabContainer, title, content, customContent, options)
+        local frame, body = CreateParagraph(tabContainer, title, content, customContent)
+        if options then
+            if options.Tag then AddTagToElement(frame, options.Tag, options.TagColor) end
+            if options.Gradient then ApplyGradient(frame, options.Gradient[1], options.Gradient[2], options.Gradient.Rotation) end
+        end
+        return frame, body
     end
     
-    function Window:AddButton(tabContainer, title, content, iconId, callback)
-        return CreateButton(tabContainer, title, content, iconId, callback)
+    function Window:AddButton(tabContainer, title, content, iconId, callback, options)
+        local frame = CreateButton(tabContainer, title, content, iconId, callback)
+        if options then
+            if options.Tag then AddTagToElement(frame, options.Tag, options.TagColor) end
+            if options.Gradient then ApplyGradient(frame, options.Gradient[1], options.Gradient[2], options.Gradient.Rotation) end
+        end
+        return frame
     end
 
     function Window:AddHoldButton(tabContainer, title, content, iconId, holdTime, callback, options)
@@ -4650,16 +4563,37 @@ function Kairo:CreateWindow(config)
         return self[creatorName](self, sectionBody, ...)
     end
     
-    function Window:AddToggle(tabContainer, title, content, defaultValue, callback, elementId)
-        return CreateToggle(tabContainer, title, content, defaultValue, callback, elementId)
+    function Window:AddToggle(tabContainer, title, content, defaultValue, callback, elementId, options)
+        local frame = CreateToggle(tabContainer, title, content, defaultValue, callback, elementId)
+        if options then
+            if options.Tag then AddTagToElement(frame, options.Tag, options.TagColor) end
+            if options.Gradient then ApplyGradient(frame, options.Gradient[1], options.Gradient[2], options.Gradient.Rotation) end
+        end
+        return frame
+    end
+
+    function Window:AddCheckBox(tabContainer, title, content, defaultValue, callback, elementId, options)
+        return CreateCheckBox(tabContainer, title, content, defaultValue, callback, elementId, options)
     end
     
     function Window:AddInput(tabContainer, title, content, placeholder, callback, elementId)
         return CreateInput(tabContainer, title, content, placeholder, callback, elementId)
     end
     
-    function Window:AddDropdown(tabContainer, title, content, options, multi, defaultValue, callback, elementId)
-        return CreateDropdown(tabContainer, title, content, options, multi, defaultValue, callback, elementId)
+    function Window:AddDropdown(tabContainer, title, content, options, multi, defaultValue, callback, elementId, settings)
+        local frameObject = CreateDropdown(tabContainer, title, content, options, multi, defaultValue, callback, elementId)
+        if settings and settings.Searchable and frameObject and frameObject.Frame then
+            AddSearchToDropdown(frameObject.Frame, frameObject, options)
+        end
+        return frameObject
+    end
+
+    function Window:AddSearchableDropdown(tabContainer, title, content, options, defaultValue, callback, elementId)
+        local dropdown = CreateDropdown(tabContainer, title, content, options, false, defaultValue, callback, elementId)
+        if type(dropdown) == "table" and dropdown.Frame then
+            AddSearchToDropdown(dropdown.Frame, dropdown, options)
+        end
+        return dropdown
     end
     
     function Window:AddMultiDropdown(tabContainer, title, content, options, defaultValue, callback, elementId)
