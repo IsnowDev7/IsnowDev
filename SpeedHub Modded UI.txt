@@ -4292,6 +4292,293 @@ function Kairo:CreateWindow(config)
         end)
     end
 
+    -- ========================= SpeedHub media and utility extensions =========================
+
+    local function NormalizeMediaSource(source)
+        if source == nil then return "" end
+        local value = tostring(source)
+        if value:match("^%d+$") then
+            return "rbxassetid://" .. value
+        end
+        return value
+    end
+
+    local function AddCorner(parent, radius)
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, radius or 8)
+        corner.Parent = parent
+        return corner
+    end
+
+    local function AddPanelStroke(parent, color, transparency)
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = color or Color3.fromRGB(255, 255, 255)
+        stroke.Transparency = transparency == nil and 0.82 or transparency
+        stroke.Thickness = 1
+        stroke.Parent = parent
+        return stroke
+    end
+
+    local function CreateMediaPanel(tabContainer, mediaConfig)
+        mediaConfig = mediaConfig or {}
+        local panel = Instance.new("Frame")
+        panel.Name = mediaConfig.Name or "MediaPanel"
+        panel.LayoutOrder = mediaConfig.LayoutOrder or -100
+        panel.Size = mediaConfig.Size or UDim2.new(1, 0, 0, 148)
+        panel.BackgroundColor3 = mediaConfig.BackgroundColor3 or Color3.fromRGB(25, 25, 25)
+        panel.BackgroundTransparency = mediaConfig.BackgroundTransparency or 0.08
+        panel.BorderSizePixel = 0
+        panel.ClipsDescendants = true
+        panel.Parent = tabContainer
+        AddCorner(panel, mediaConfig.CornerRadius or 8)
+        AddPanelStroke(panel, ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme], 0.8)
+
+        local media = Instance.new("ImageLabel")
+        media.Name = "Thumbnail"
+        media.BackgroundTransparency = 1
+        media.Position = UDim2.fromOffset(0, 0)
+        media.Size = UDim2.new(1, 0, 1, 0)
+        media.ScaleType = mediaConfig.ScaleType or Enum.ScaleType.Crop
+        media.Image = NormalizeMediaSource(mediaConfig.Image or mediaConfig.Thumbnail)
+        media.Parent = panel
+        AddCorner(media, mediaConfig.CornerRadius or 8)
+
+        local video = nil
+        local videoSource = mediaConfig.Video or mediaConfig.VideoSource
+        if videoSource and tostring(videoSource) ~= "" then
+            video = Instance.new("VideoFrame")
+            video.Name = "Video"
+            video.BackgroundTransparency = 1
+            video.Position = UDim2.fromOffset(0, 0)
+            video.Size = UDim2.new(1, 0, 1, 0)
+            video.Looped = mediaConfig.Looped ~= false
+            video.Volume = mediaConfig.Volume or 0
+            video.Video = NormalizeMediaSource(videoSource)
+            video.Visible = mediaConfig.AutoPlay == true or mediaConfig.Playing == true
+            video.Parent = panel
+            AddCorner(video, mediaConfig.CornerRadius or 8)
+            if video.Visible then pcall(function() video:Play() end) end
+        end
+
+        local shade = Instance.new("Frame")
+        shade.Name = "Shade"
+        shade.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        shade.BackgroundTransparency = mediaConfig.ShadeTransparency or 0.42
+        shade.BorderSizePixel = 0
+        shade.Size = UDim2.new(1, 0, 1, 0)
+        shade.Parent = panel
+
+        local title = Instance.new("TextLabel")
+        title.Name = "Title"
+        title.BackgroundTransparency = 1
+        title.Position = UDim2.fromOffset(14, 12)
+        title.Size = UDim2.new(1, -28, 0, 24)
+        title.Font = Enum.Font.GothamBold
+        title.Text = mediaConfig.Title or ""
+        title.TextColor3 = mediaConfig.TitleColor or Color3.fromRGB(255, 255, 255)
+        title.TextSize = mediaConfig.TitleSize or 17
+        title.TextXAlignment = Enum.TextXAlignment.Left
+        title.Parent = panel
+
+        local subtitle = Instance.new("TextLabel")
+        subtitle.Name = "Subtitle"
+        subtitle.BackgroundTransparency = 1
+        subtitle.Position = UDim2.fromOffset(14, 39)
+        subtitle.Size = UDim2.new(1, -28, 0, 34)
+        subtitle.Font = Enum.Font.Gotham
+        subtitle.Text = mediaConfig.Subtitle or mediaConfig.Description or ""
+        subtitle.TextColor3 = Color3.fromRGB(235, 235, 235)
+        subtitle.TextTransparency = 0.12
+        subtitle.TextSize = mediaConfig.SubtitleSize or 11
+        subtitle.TextWrapped = true
+        subtitle.TextXAlignment = Enum.TextXAlignment.Left
+        subtitle.Parent = panel
+
+        local api = {}
+        function api:SetImage(source)
+            media.Image = NormalizeMediaSource(source)
+        end
+        function api:SetVideo(source)
+            if not video then
+                video = Instance.new("VideoFrame")
+                video.Name = "Video"
+                video.BackgroundTransparency = 1
+                video.Size = UDim2.new(1, 0, 1, 0)
+                video.Looped = true
+                video.Volume = 0
+                video.Parent = panel
+                AddCorner(video, mediaConfig.CornerRadius or 8)
+            end
+            video.Video = NormalizeMediaSource(source)
+        end
+        function api:Play()
+            if video then video.Visible = true; pcall(function() video:Play() end) end
+        end
+        function api:Pause()
+            if video then pcall(function() video:Pause() end) end
+        end
+        function api:SetTitle(value) title.Text = tostring(value or "") end
+        function api:SetSubtitle(value) subtitle.Text = tostring(value or "") end
+        function api:GetFrame() return panel end
+        return api
+    end
+
+    local function CreateUserPanel(tabContainer, userConfig)
+        userConfig = userConfig or {}
+        local panel = Instance.new("Frame")
+        panel.Name = userConfig.Name or "UserPanel"
+        panel.LayoutOrder = userConfig.LayoutOrder or -90
+        panel.Size = userConfig.Size or UDim2.new(1, 0, 0, 82)
+        panel.BackgroundColor3 = userConfig.BackgroundColor3 or Color3.fromRGB(34, 34, 34)
+        panel.BackgroundTransparency = 0.08
+        panel.BorderSizePixel = 0
+        panel.Parent = tabContainer
+        AddCorner(panel, userConfig.CornerRadius or 10)
+        AddPanelStroke(panel, ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme], 0.8)
+
+        local avatar = Instance.new("ImageLabel")
+        avatar.Name = "Thumbnail"
+        avatar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        avatar.BackgroundTransparency = 0
+        avatar.BorderSizePixel = 0
+        avatar.Position = UDim2.fromOffset(12, 13)
+        avatar.Size = UDim2.fromOffset(56, 56)
+        avatar.Image = NormalizeMediaSource(userConfig.Thumbnail or userConfig.Avatar or "")
+        avatar.ScaleType = Enum.ScaleType.Crop
+        avatar.Parent = panel
+        AddCorner(avatar, 28)
+        AddPanelStroke(avatar, Color3.fromRGB(255, 255, 255), 0.35)
+
+        local status = Instance.new("Frame")
+        status.Name = "Status"
+        status.AnchorPoint = Vector2.new(1, 1)
+        status.Position = UDim2.new(0, 67, 0, 69)
+        status.Size = UDim2.fromOffset(14, 14)
+        status.BackgroundColor3 = userConfig.StatusColor or Color3.fromRGB(55, 210, 125)
+        status.BorderSizePixel = 0
+        status.Parent = panel
+        AddCorner(status, 7)
+        AddPanelStroke(status, Color3.fromRGB(20, 20, 20), 0.15)
+
+        local name = Instance.new("TextLabel")
+        name.Name = "Name"
+        name.BackgroundTransparency = 1
+        name.Position = UDim2.fromOffset(82, 14)
+        name.Size = UDim2.new(1, -94, 0, 22)
+        name.Font = Enum.Font.GothamBold
+        name.Text = userConfig.NameText or userConfig.Username or "User"
+        name.TextColor3 = Color3.fromRGB(255, 255, 255)
+        name.TextSize = 15
+        name.TextXAlignment = Enum.TextXAlignment.Left
+        name.Parent = panel
+
+        local info = Instance.new("TextLabel")
+        info.Name = "Info"
+        info.BackgroundTransparency = 1
+        info.Position = UDim2.fromOffset(82, 38)
+        info.Size = UDim2.new(1, -94, 0, 28)
+        info.Font = Enum.Font.Gotham
+        info.Text = userConfig.Info or userConfig.Status or "Online"
+        info.TextColor3 = Color3.fromRGB(210, 210, 210)
+        info.TextSize = 11
+        info.TextWrapped = true
+        info.TextXAlignment = Enum.TextXAlignment.Left
+        info.Parent = panel
+
+        local api = {}
+        function api:SetThumbnail(source) avatar.Image = NormalizeMediaSource(source) end
+        function api:SetName(value) name.Text = tostring(value or "") end
+        function api:SetInfo(value) info.Text = tostring(value or "") end
+        function api:SetStatusColor(color) status.BackgroundColor3 = color end
+        function api:GetFrame() return panel end
+        return api
+    end
+
+    local function CreateDraggableUI(statusConfig)
+        statusConfig = statusConfig or {}
+        local holder = Instance.new("Frame")
+        holder.Name = statusConfig.Name or "DraggableUI"
+        holder.Size = statusConfig.Size or UDim2.fromOffset(300, 42)
+        holder.Position = statusConfig.Position or UDim2.new(0.5, -150, 0, 24)
+        holder.BackgroundColor3 = statusConfig.BackgroundColor3 or Color3.fromRGB(12, 12, 12)
+        holder.BackgroundTransparency = statusConfig.BackgroundTransparency or 0.05
+        holder.BorderSizePixel = 0
+        holder.ZIndex = 200
+        holder.Parent = ScreenGui
+        AddCorner(holder, statusConfig.CornerRadius or 6)
+        AddPanelStroke(holder, statusConfig.StrokeColor or Color3.fromRGB(0, 0, 0), 0.05)
+
+        local label = Instance.new("TextLabel")
+        label.Name = "StatusLabel"
+        label.BackgroundTransparency = 1
+        label.Size = UDim2.new(1, -20, 1, 0)
+        label.Position = UDim2.fromOffset(10, 0)
+        label.Font = statusConfig.Font or Enum.Font.Code
+        label.TextColor3 = statusConfig.TextColor or Color3.fromRGB(245, 245, 245)
+        label.TextSize = statusConfig.TextSize or 16
+        label.Text = statusConfig.Text or "SpeedHub | 0 fps | 0 ms"
+        label.TextXAlignment = Enum.TextXAlignment.Center
+        label.Parent = holder
+
+        MakeDraggable(holder, holder)
+        local api = {}
+        function api:SetText(value) label.Text = tostring(value or "") end
+        function api:SetVisible(value) holder.Visible = value == true end
+        function api:GetFrame() return holder end
+        function api:Destroy() holder:Destroy() end
+        function api:StartTelemetry()
+            local frames = 0
+            local started = os.clock()
+            local connection
+            connection = RunService.RenderStepped:Connect(function(dt)
+                frames += 1
+                local elapsed = os.clock() - started
+                if elapsed >= 0.5 then
+                    local fps = math.floor(frames / elapsed + 0.5)
+                    local ms = math.floor((dt or 0) * 1000 + 0.5)
+                    label.Text = string.format(statusConfig.Format or "SpeedHub | %d fps | %d ms", fps, ms)
+                    frames = 0
+                    started = os.clock()
+                end
+            end)
+            api._connection = connection
+            return connection
+        end
+        return api
+    end
+
+    local function CreateCopyButton(parent, value, copyConfig)
+        copyConfig = copyConfig or {}
+        local button = Instance.new("ImageButton")
+        button.Name = copyConfig.Name or "CopyButton"
+        button.BackgroundTransparency = 1
+        button.Size = copyConfig.Size or UDim2.fromOffset(24, 24)
+        button.Image = copyConfig.Icon or "rbxassetid://6031094671" -- Lucide-style copy icon asset
+        button.ImageColor3 = copyConfig.IconColor or Color3.fromRGB(230, 230, 230)
+        button.AutoButtonColor = false
+        button.Parent = parent
+        local copied = false
+        button.Activated:Connect(function()
+            local text = type(value) == "function" and value() or value
+            local ok = pcall(function()
+                if setclipboard then setclipboard(tostring(text)) else error("clipboard unavailable") end
+            end)
+            copied = ok
+            if copyConfig.Callback then copyConfig.Callback(ok, text) end
+            if ok then
+                button.ImageColor3 = Color3.fromRGB(80, 220, 140)
+                task.delay(0.7, function() if button.Parent then button.ImageColor3 = copyConfig.IconColor or Color3.fromRGB(230, 230, 230) end end)
+            end
+        end)
+        return button
+    end
+
+    local function CreateTabHero(tabContainer, heroConfig)
+        heroConfig = heroConfig or {}
+        heroConfig.LayoutOrder = heroConfig.LayoutOrder or -100
+        return CreateMediaPanel(tabContainer, heroConfig)
+    end
+
     function Window:AddCodeWindow(tabContainer, title, code, animate)
         return CreateCodeWindow(tabContainer, title, code, animate)
     end
@@ -4312,6 +4599,31 @@ function Kairo:CreateWindow(config)
         SetWindowVisible(false)
     end
     
+    function Window:AddVideo(tabContainer, title, content, videoSource, config)
+        config = config or {}
+        config.Title = title
+        config.Description = content
+        config.Video = videoSource
+        return CreateMediaPanel(tabContainer, config)
+    end
+
+    function Window:AddTabHero(tabContainer, config)
+        return CreateTabHero(tabContainer, config)
+    end
+
+    function Window:AddUserPanel(tabContainer, config)
+        return CreateUserPanel(tabContainer, config)
+    end
+
+    function Window:AddDraggableUI(config)
+        return CreateDraggableUI(config)
+    end
+
+    function Window:AddCopyButton(parent, value, config)
+        assert(typeof(parent) == "Instance", "parent must be an Instance")
+        return CreateCopyButton(parent, value, config)
+    end
+
     function Window:CreateTab(tabName, iconId)
         return CreateTabButton(tabName, iconId, false)
     end
