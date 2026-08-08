@@ -862,6 +862,8 @@ end
 function Kairo:CreateWindow(config)
     config = config or {}
     local Title = config.Title or "Kairo UI"
+    local SubTitle = config.SubTitle or config.Subtitle or ""
+    local Icon = config.Icon or ""
     local Theme = config.Theme or "Default"
     local Size = config.Size or UDim2.fromOffset(520, 420)
     local Center = config.Center ~= false
@@ -939,7 +941,7 @@ function Kairo:CreateWindow(config)
     Top.BackgroundTransparency = 0.999
     Top.BorderColor3 = Color3.fromRGB(0, 0, 0)
     Top.BorderSizePixel = 0
-    Top.Size = UDim2.new(1, 0, 0, 38)
+    Top.Size = UDim2.new(1, 0, 0, 46)
     Top.Name = "Top"
     Top.Parent = Main
 
@@ -953,9 +955,31 @@ function Kairo:CreateWindow(config)
     TitleLabel.BackgroundTransparency = 0.999
     TitleLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
     TitleLabel.BorderSizePixel = 0
-    TitleLabel.Size = UDim2.new(1, -150, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 10, 0, 0)
+    TitleLabel.Size = UDim2.new(1, -150, 0, 20)
+    TitleLabel.Position = UDim2.new(0, 42, 0, 3)
     TitleLabel.Parent = Top
+
+    local TitleIcon = Instance.new("ImageLabel")
+    TitleIcon.Name = "TitleIcon"
+    TitleIcon.BackgroundTransparency = 1
+    TitleIcon.Position = UDim2.fromOffset(9, 7)
+    TitleIcon.Size = UDim2.fromOffset(26, 26)
+    local titleIconSource = tostring(Icon)
+    TitleIcon.Image = titleIconSource:match("^https?://") or titleIconSource:match("^rbxassetid://") and titleIconSource or (titleIconSource ~= "" and "rbxassetid://" .. titleIconSource or "")
+    TitleIcon.ScaleType = Enum.ScaleType.Fit
+    TitleIcon.Parent = Top
+
+    local SubtitleLabel = Instance.new("TextLabel")
+    SubtitleLabel.Name = "SubtitleLabel"
+    SubtitleLabel.BackgroundTransparency = 1
+    SubtitleLabel.Position = UDim2.new(0, 42, 0, 22)
+    SubtitleLabel.Size = UDim2.new(1, -150, 0, 15)
+    SubtitleLabel.Text = SubTitle
+    SubtitleLabel.TextColor3 = Color3.fromRGB(155, 155, 155)
+    SubtitleLabel.TextSize = 10
+    SubtitleLabel.Font = Enum.Font.Gotham
+    SubtitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    SubtitleLabel.Parent = Top
 
     local BadgeContainer = Instance.new("Frame")
     BadgeContainer.Name = "BadgeContainer"
@@ -1131,8 +1155,8 @@ function Kairo:CreateWindow(config)
     TabFrame.BackgroundTransparency = 0.999
     TabFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     TabFrame.BorderSizePixel = 0
-    TabFrame.Position = UDim2.new(0, 9, 0, 50)
-    TabFrame.Size = UDim2.new(0, 120, 1, -59)
+    TabFrame.Position = UDim2.new(0, 9, 0, 58)
+    TabFrame.Size = UDim2.new(0, 120, 1, -67)
     TabFrame.Name = "TabFrame"
     TabFrame.Parent = Main
 
@@ -1241,8 +1265,8 @@ function Kairo:CreateWindow(config)
     ContentFrame.BackgroundTransparency = 0.999
     ContentFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     ContentFrame.BorderSizePixel = 0
-    ContentFrame.Position = UDim2.new(0, 138, 0, 50)
-    ContentFrame.Size = UDim2.new(1, -147, 1, -59)
+    ContentFrame.Position = UDim2.new(0, 138, 0, 58)
+    ContentFrame.Size = UDim2.new(1, -147, 1, -67)
     ContentFrame.Name = "ContentFrame"
     ContentFrame.Parent = Main
 
@@ -1448,7 +1472,7 @@ function Kairo:CreateWindow(config)
     end
 
     -- Element Creation Functions
-    local function CreateParagraph(tabContainer, title, content)
+    local function CreateParagraph(tabContainer, title, content, customContent)
         if not tabContainer or not tabContainer:IsA("Frame") then
             return
         end
@@ -1459,6 +1483,7 @@ function Kairo:CreateWindow(config)
         Paragraph.BorderColor3 = Color3.fromRGB(0, 0, 0)
         Paragraph.BorderSizePixel = 0
         Paragraph.Size = UDim2.new(1, 0, 0, 46)
+        Paragraph.AutomaticSize = Enum.AutomaticSize.Y
         Paragraph.Name = "Paragraph"
         Paragraph.Parent = tabContainer
 
@@ -1468,52 +1493,88 @@ function Kairo:CreateWindow(config)
 
         local ParagraphTitle = Instance.new("TextLabel")
         ParagraphTitle.Font = Enum.Font.GothamBold
-        ParagraphTitle.Text = title
+        ParagraphTitle.Text = title or "Paragraph"
         ParagraphTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
         ParagraphTitle.TextSize = 13
         ParagraphTitle.TextXAlignment = Enum.TextXAlignment.Left
-        ParagraphTitle.TextYAlignment = Enum.TextYAlignment.Top
-        ParagraphTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        ParagraphTitle.BackgroundTransparency = 0.999
-        ParagraphTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-        ParagraphTitle.BorderSizePixel = 0
-        ParagraphTitle.Position = UDim2.new(0, 10, 0, 10)
-        ParagraphTitle.Size = UDim2.new(1, -20, 0, 13)
+        ParagraphTitle.BackgroundTransparency = 1
+        ParagraphTitle.Position = UDim2.fromOffset(10, 10)
+        ParagraphTitle.Size = UDim2.new(1, -20, 0, 16)
         ParagraphTitle.Name = "ParagraphTitle"
         ParagraphTitle.Parent = Paragraph
 
-        local ParagraphContent = Instance.new("TextLabel")
-        ParagraphContent.Font = Enum.Font.GothamBold
-        ParagraphContent.Text = content
-        ParagraphContent.TextColor3 = Color3.fromRGB(255, 255, 255)
-        ParagraphContent.TextSize = 12
-        ParagraphContent.TextTransparency = 0.6
-        ParagraphContent.TextXAlignment = Enum.TextXAlignment.Left
-        ParagraphContent.TextYAlignment = Enum.TextYAlignment.Bottom
-        ParagraphContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        ParagraphContent.BackgroundTransparency = 0.999
-        ParagraphContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
-        ParagraphContent.BorderSizePixel = 0
-        ParagraphContent.Position = UDim2.new(0, 10, 0, 23)
-        ParagraphContent.Name = "ParagraphContent"
-        ParagraphContent.Parent = Paragraph
+        local Body = Instance.new("Frame")
+        Body.Name = "ParagraphBody"
+        Body.BackgroundTransparency = 1
+        Body.Position = UDim2.fromOffset(10, 31)
+        Body.Size = UDim2.new(1, -20, 0, 20)
+        Body.AutomaticSize = Enum.AutomaticSize.Y
+        Body.Parent = Paragraph
 
-        local textSize =
-            TextService:GetTextSize(
-            content,
-            12,
-            Enum.Font.GothamBold,
-            Vector2.new(ContentScroll.AbsoluteSize.X - 40, math.huge)
-        )
+        local BodyLayout = Instance.new("UIListLayout")
+        BodyLayout.Padding = UDim.new(0, 5)
+        BodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        BodyLayout.Parent = Body
 
-        ParagraphContent.Size = UDim2.new(1, -20, 0, textSize.Y)
-        ParagraphContent.TextWrapped = true
-        Paragraph.Size = UDim2.new(1, 0, 0, math.max(46, textSize.Y + 33))
+        local function AddCustomObject(spec)
+            if typeof(spec) == "Instance" then
+                spec.Parent = Body
+                return spec
+            end
+            if type(spec) ~= "table" then return end
+            local objectType = spec.Type or "TextLabel"
+            local object
+            if objectType == "ImageLabel" then
+                object = Instance.new("ImageLabel")
+                object.Image = tostring(spec.Image or spec.ImageId or "")
+                object.ScaleType = spec.ScaleType or Enum.ScaleType.Fit
+            elseif objectType == "TextButton" then
+                object = Instance.new("TextButton")
+                object.Text = spec.Text or "Button"
+                object.Activated:Connect(function()
+                    if spec.Callback then spec.Callback(object) end
+                end)
+            elseif objectType == "Frame" then
+                object = Instance.new("Frame")
+            else
+                object = Instance.new("TextLabel")
+                object.Text = spec.Text or ""
+                object.TextWrapped = spec.TextWrapped ~= false
+                object.TextXAlignment = spec.TextXAlignment or Enum.TextXAlignment.Left
+            end
+            object.Name = spec.Name or objectType
+            object.BackgroundColor3 = spec.BackgroundColor3 or Color3.fromRGB(255, 255, 255)
+            object.BackgroundTransparency = spec.BackgroundTransparency == nil and 1 or spec.BackgroundTransparency
+            object.BorderSizePixel = spec.BorderSizePixel or 0
+            object.Size = spec.Size or UDim2.new(1, 0, 0, spec.Height or 24)
+            object.LayoutOrder = spec.LayoutOrder or 0
+            if object:IsA("TextLabel") or object:IsA("TextButton") then
+                object.Font = spec.Font or Enum.Font.GothamBold
+                object.TextColor3 = spec.TextColor3 or Color3.fromRGB(230, 230, 230)
+                object.TextSize = spec.TextSize or 12
+            end
+            object.Parent = Body
+            if spec.CornerRadius then
+                local c = Instance.new("UICorner")
+                c.CornerRadius = UDim.new(0, spec.CornerRadius)
+                c.Parent = object
+            end
+            return object
+        end
 
-        task.wait(0.1)
-        UpdateContentSize()
+        -- customContent may be a builder function, an Instance, or a list of specs.
+        if type(customContent) == "function" then
+            customContent(Body, AddCustomObject)
+        elseif typeof(customContent) == "Instance" then
+            AddCustomObject(customContent)
+        elseif type(customContent) == "table" then
+            for _, spec in ipairs(customContent) do AddCustomObject(spec) end
+        elseif content ~= nil and tostring(content) ~= "" then
+            AddCustomObject({Type = "TextLabel", Text = tostring(content), Height = 24})
+        end
 
-        return Paragraph
+        task.defer(UpdateContentSize)
+        return Paragraph, Body
     end
 
     local function CreateButton(tabContainer, title, content, iconId, callback)
@@ -3081,7 +3142,7 @@ function Kairo:CreateWindow(config)
         ColorPickerFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
         ColorPickerFrame.BorderSizePixel = 0
         ColorPickerFrame.Position = UDim2.new(1, -12, 0, 35)
-        ColorPickerFrame.Size = UDim2.new(0, 200, 0, 0)
+        ColorPickerFrame.Size = UDim2.new(0, 360, 0, 0)
         ColorPickerFrame.Name = "ColorPickerFrame"
         ColorPickerFrame.Visible = false
         ColorPickerFrame.ClipsDescendants = true
@@ -3104,7 +3165,7 @@ function Kairo:CreateWindow(config)
         HueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
         HueFrame.BorderSizePixel = 0
         HueFrame.Position = UDim2.new(0, 10, 0, 10)
-        HueFrame.Size = UDim2.new(0, 180, 0, 100)
+        HueFrame.Size = UDim2.new(0, 220, 0, 20)
         HueFrame.Name = "HueFrame"
         HueFrame.ZIndex = 11
         HueFrame.Parent = ColorPickerFrame
@@ -3132,8 +3193,8 @@ function Kairo:CreateWindow(config)
         SatValFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         SatValFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
         SatValFrame.BorderSizePixel = 0
-        SatValFrame.Position = UDim2.new(0, 10, 0, 120)
-        SatValFrame.Size = UDim2.new(0, 180, 0, 80)
+        SatValFrame.Position = UDim2.new(0, 240, 0, 10)
+        SatValFrame.Size = UDim2.new(0, 110, 0, 100)
         SatValFrame.Name = "SatValFrame"
         SatValFrame.ZIndex = 11
         SatValFrame.Parent = ColorPickerFrame
@@ -3158,7 +3219,7 @@ function Kairo:CreateWindow(config)
         HueSlider.BorderColor3 = Color3.fromRGB(0, 0, 0)
         HueSlider.BorderSizePixel = 0
         HueSlider.Position = UDim2.new(0, 0, 0.5, 0)
-        HueSlider.Size = UDim2.new(0, 4, 1, 0)
+        HueSlider.Size = UDim2.new(0, 4, 1, 8)
         HueSlider.Name = "HueSlider"
         HueSlider.ZIndex = 12
         HueSlider.Parent = HueFrame
@@ -3287,12 +3348,12 @@ function Kairo:CreateWindow(config)
                 local pickerAbsPos = ColorPicker.AbsolutePosition
                 local pickerAbsSize = ColorPicker.AbsoluteSize
                 ColorPickerFrame.Position =
-                    UDim2.new(0, pickerAbsPos.X + pickerAbsSize.X - 212, 0, pickerAbsPos.Y + pickerAbsSize.Y + 5)
+                    UDim2.new(0, pickerAbsPos.X + pickerAbsSize.X - 372, 0, pickerAbsPos.Y + pickerAbsSize.Y + 5)
 
                 ColorPickerFrame.Visible = true
-                TweenService:Create(ColorPickerFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 200, 0, 210)}):Play()
+                TweenService:Create(ColorPickerFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 360, 0, 130)}):Play()
             else
-                TweenService:Create(ColorPickerFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 200, 0, 0)}):Play()
+                TweenService:Create(ColorPickerFrame, TweenInfo.new(0.3), {Size = UDim2.new(0, 360, 0, 0)}):Play()
                 task.wait(0.3)
                 ColorPickerFrame.Visible = false
             end
@@ -4196,78 +4257,6 @@ function Kairo:CreateWindow(config)
         return body, section
     end
 
-    local function CreateDisplayFeature(displayConfig)
-        displayConfig = displayConfig or {}
-        local displayGui = ScreenGui:FindFirstChild("DisplayFeatureGui")
-        if not displayGui then
-            displayGui = Instance.new("Frame")
-            displayGui.Name = "DisplayFeatureGui"
-            displayGui.AnchorPoint = Vector2.new(1, 0.5)
-            displayGui.Position = UDim2.new(1, -18, 0.5, 0)
-            displayGui.Size = UDim2.fromOffset(displayConfig.Width or 170, displayConfig.Height or 70)
-            displayGui.BackgroundColor3 = displayConfig.Color or Color3.fromRGB(15, 15, 15)
-            displayGui.BackgroundTransparency = displayConfig.Transparency or 0.08
-            displayGui.BorderSizePixel = 0
-            displayGui.Visible = false
-            displayGui.ZIndex = 120
-            displayGui.Parent = ScreenGui
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0, 6)
-            corner.Parent = displayGui
-            local stroke = Instance.new("UIStroke")
-            stroke.Color = displayConfig.StrokeColor or ConfigSystem.ThemeColors[ConfigSystem.CurrentTheme]
-            stroke.Thickness = 1
-            stroke.Parent = displayGui
-            local image = Instance.new("ImageLabel")
-            image.Name = "Image"
-            image.BackgroundTransparency = 1
-            image.Position = UDim2.fromOffset(8, 8)
-            image.Size = UDim2.fromOffset(54, 54)
-            image.ScaleType = Enum.ScaleType.Fit
-            local displayImageSource = tostring(displayConfig.Image or displayConfig.ImageId or "")
-            image.Image = displayImageSource:match("^https?://") or displayImageSource:match("^rbxassetid://") and displayImageSource or "rbxassetid://" .. displayImageSource
-            image.ZIndex = 121
-            image.Parent = displayGui
-            local label = Instance.new("TextLabel")
-            label.Name = "Label"
-            label.BackgroundTransparency = 1
-            label.Position = UDim2.fromOffset(70, 8)
-            label.Size = UDim2.new(1, -78, 1, -16)
-            label.Text = displayConfig.Text or displayConfig.Label or "Display"
-            label.TextColor3 = displayConfig.TextColor or Color3.fromRGB(255, 255, 255)
-            label.TextSize = displayConfig.TextSize or 12
-            label.Font = displayConfig.Font or Enum.Font.GothamBold
-            label.TextWrapped = true
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.TextYAlignment = Enum.TextYAlignment.Center
-            label.ZIndex = 121
-            label.Parent = displayGui
-        end
-        local api = {}
-        local function setVisible(value)
-            if displayGui.Visible == value then return end
-            if value then
-                displayGui.Visible = true
-                displayGui.Position = UDim2.new(1, 25, 0.5, 0)
-                TweenService:Create(displayGui, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1, -18, 0.5, 0)}):Play()
-            else
-                local tween = TweenService:Create(displayGui, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, 25, 0.5, 0)})
-                tween.Completed:Connect(function() displayGui.Visible = false end)
-                tween:Play()
-            end
-        end
-        function api:Show() setVisible(true) end
-        function api:Hide() setVisible(false) end
-        function api:Toggle() setVisible(not displayGui.Visible) end
-        function api:SetText(value) displayGui.Label.Text = tostring(value) end
-        function api:SetImage(value)             local imageSource = tostring(value or "")
-            displayGui.Image.Image = imageSource:match("^https?://") or imageSource:match("^rbxassetid://") and imageSource or "rbxassetid://" .. imageSource end
-        function api:SetColor(value) displayGui.BackgroundColor3 = value end
-        function api:SetVisible(value) setVisible(value == true) end
-        api.Frame = displayGui
-        return api
-    end
-
     -- Window Methods
     local Window = {}
 
@@ -4303,8 +4292,8 @@ function Kairo:CreateWindow(config)
         return CreateTabButton(tabName, iconId, false)
     end
     
-    function Window:AddParagraph(tabContainer, title, content)
-        return CreateParagraph(tabContainer, title, content)
+    function Window:AddParagraph(tabContainer, title, content, customContent)
+        return CreateParagraph(tabContainer, title, content, customContent)
     end
     
     function Window:AddButton(tabContainer, title, content, iconId, callback)
@@ -4313,10 +4302,6 @@ function Kairo:CreateWindow(config)
 
     function Window:AddHoldButton(tabContainer, title, content, iconId, holdTime, callback, options)
         return CreateHoldButton(tabContainer, title, content, iconId, holdTime, callback, options)
-    end
-
-    function Window:AddDisplayFeature(displayConfig)
-        return CreateDisplayFeature(displayConfig)
     end
 
     function Window:AddSection(tabContainer, title, defaultOpen)
