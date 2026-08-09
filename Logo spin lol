@@ -1,0 +1,124 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local IMAGE_ID = "rbxassetid://132053504558642"
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ImageSpinGlow"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local container = Instance.new("Frame")
+container.Name = "Container"
+container.Size = UDim2.new(0, 200, 0, 200)
+container.Position = UDim2.new(0.5, -100, 0.5, -100)
+container.BackgroundTransparency = 1
+container.Parent = screenGui
+
+-- Soft glow behind the image
+local glow = Instance.new("ImageLabel")
+glow.Name = "Glow"
+glow.Size = UDim2.new(1, 40, 1, 40)
+glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+glow.AnchorPoint = Vector2.new(0.5, 0.5)
+glow.BackgroundTransparency = 1
+glow.Image = IMAGE_ID
+glow.ImageColor3 = Color3.fromRGB(255, 255, 255)
+glow.ImageTransparency = 0.4
+glow.ZIndex = 1
+glow.Parent = container
+
+-- Main image
+local image = Instance.new("ImageLabel")
+image.Name = "MainImage"
+image.Size = UDim2.new(1, 0, 1, 0)
+image.Position = UDim2.new(0.5, 0, 0.5, 0)
+image.AnchorPoint = Vector2.new(0.5, 0.5)
+image.BackgroundTransparency = 1
+image.Image = IMAGE_ID
+image.ZIndex = 2
+image.Parent = container
+
+-- Shine overlay: same image shape, used to mask the running line to the image's pixels
+local shine = Instance.new("ImageLabel")
+shine.Name = "Shine"
+shine.Size = UDim2.new(1, 0, 1, 0)
+shine.Position = UDim2.new(0.5, 0, 0.5, 0)
+shine.AnchorPoint = Vector2.new(0.5, 0.5)
+shine.BackgroundTransparency = 1
+shine.Image = IMAGE_ID
+shine.ImageColor3 = Color3.fromRGB(255, 255, 255)
+shine.ZIndex = 3
+shine.Parent = container
+
+local shineGradient = Instance.new("UIGradient")
+shineGradient.Rotation = 20
+shineGradient.Transparency = NumberSequence.new({
+	NumberSequenceKeypoint.new(0.00, 1),
+	NumberSequenceKeypoint.new(0.45, 1),
+	NumberSequenceKeypoint.new(0.50, 0),
+	NumberSequenceKeypoint.new(0.55, 1),
+	NumberSequenceKeypoint.new(1.00, 1),
+})
+shineGradient.Offset = Vector2.new(-1, 0)
+shineGradient.Parent = shine
+
+-- Slow spin of the whole container
+local spinInfo = TweenInfo.new(
+	8,
+	Enum.EasingStyle.Linear,
+	Enum.EasingDirection.InOut,
+	-1,
+	false,
+	0
+)
+
+local function spinLoop()
+	while true do
+		container.Rotation = 0
+		local tween = TweenService:Create(container, spinInfo, {Rotation = 360})
+		tween:Play()
+		tween.Completed:Wait()
+	end
+end
+
+task.spawn(spinLoop)
+
+-- Running shine line sweeping across the image
+local function shineLoop()
+	while true do
+		shineGradient.Offset = Vector2.new(-1, 0)
+		local tween = TweenService:Create(shineGradient, TweenInfo.new(
+			1.8,
+			Enum.EasingStyle.Sine,
+			Enum.EasingDirection.InOut,
+			0,
+			false,
+			0
+		), {Offset = Vector2.new(1, 0)})
+		tween:Play()
+		tween.Completed:Wait()
+		task.wait(1.2)
+	end
+end
+
+task.spawn(shineLoop)
+
+-- Fast, small glow pulse
+local glowInfo = TweenInfo.new(
+	0.35,
+	Enum.EasingStyle.Sine,
+	Enum.EasingDirection.InOut,
+	-1,
+	true,
+	0
+)
+
+local glowTween = TweenService:Create(glow, glowInfo, {
+	ImageTransparency = 0.55,
+	Size = UDim2.new(1, 48, 1, 48)
+})
+glowTween:Play()
