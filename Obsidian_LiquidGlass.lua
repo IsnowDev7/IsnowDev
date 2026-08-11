@@ -5735,17 +5735,18 @@ do
             Parent = Ball,
         })
         --// Liquid Glass Effect
-        New("Frame", {
-            BackgroundColor3 = Color3.new(1, 1, 1),
-            BackgroundTransparency = 0.5,
-            Size = UDim2.fromScale(1, 1),
-            BorderSizePixel = 0,
+        New("ImageLabel", {
+            Size = UDim2.new(1, 0, 1, 0),
+            ImageColor3 = Color3.new(1, 1, 1),
+            ImageTransparency = 0.5,
+            BackgroundTransparency = 1,
+            Name = "Highlight",
             ZIndex = 3,
             Parent = Ball,
         })
         New("UICorner", {
             CornerRadius = UDim.new(1, 0),
-            Parent = Ball:FindFirstChildOfClass("Frame"),
+            Parent = Ball:FindFirstChildOfClass("ImageLabel"),
         })
 
         function Toggle:UpdateColors()
@@ -6368,17 +6369,18 @@ do
                 Parent = Ball,
             })
             --// Liquid Glass Effect
-            New("Frame", {
-                BackgroundColor3 = Color3.new(1, 1, 1),
-                BackgroundTransparency = 0.5,
-                Size = UDim2.fromScale(1, 1),
-                BorderSizePixel = 0,
+            New("ImageLabel", {
+                Size = UDim2.new(1, 0, 1, 0),
+                ImageColor3 = Color3.new(1, 1, 1),
+                ImageTransparency = 0.5,
+                BackgroundTransparency = 1,
+                Name = "Highlight",
                 ZIndex = Bar.ZIndex + 5,
                 Parent = Ball,
             })
             New("UICorner", {
                 CornerRadius = UDim.new(1, 0),
-                Parent = Ball:FindFirstChildOfClass("Frame"),
+                Parent = Ball:FindFirstChildOfClass("ImageLabel"),
             })
         end
 
