@@ -412,7 +412,6 @@ local Templates = {
         AddUserPanel = false,
         Username = true,
         AddInformation = {},
-        UserPanelIcon = "rbxassetid://97682394690683",
 
         UnlockMouseWhileOpen = true,
 
@@ -9950,6 +9949,110 @@ function Library:CreateWindow(WindowInfo)
             ZIndex = 2
         })
 
+        --// USER PANEL \\--
+        local UserPanelHeight = 0
+        if WindowInfo.AddUserPanel then
+            UserPanelHeight = 80
+            
+            local UserPanel = New("Frame", {
+                BackgroundColor3 = "MainColor",
+                Size = UDim2.new(1, 0, 0, UserPanelHeight),
+                Position = UDim2.fromOffset(0, 48),
+                Parent = MainFrame,
+                ZIndex = 3,
+            })
+            
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
+                    Parent = UserPanel,
+                })
+            )
+
+            New("UIPadding", {
+                PaddingLeft = UDim.new(0, 10),
+                PaddingRight = UDim.new(0, 10),
+                PaddingTop = UDim.new(0, 8),
+                PaddingBottom = UDim.new(0, 8),
+                Parent = UserPanel,
+            })
+
+            -- User Avatar
+            local UserAvatar = New("ImageLabel", {
+                BackgroundColor3 = Library.Scheme.AccentColor,
+                Image = "rbxasset://textures/face.png",
+                Size = UDim2.fromOffset(40, 40),
+                Position = UDim2.fromOffset(0, 0),
+                Parent = UserPanel,
+            })
+
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(0, 5),
+                    Parent = UserAvatar,
+                })
+            )
+
+            -- User Info Container
+            local UserInfoContainer = New("Frame", {
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, -60, 1, 0),
+                Position = UDim2.fromOffset(50, 0),
+                Parent = UserPanel,
+            })
+
+            -- Username Greeting
+            if WindowInfo.Username then
+                local Username = LocalPlayer.Name
+                New("TextLabel", {
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 20),
+                    Text = "Good Afternoon, @" .. Username .. "!",
+                    TextSize = 13,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextColor3 = "FontColor",
+                    Parent = UserInfoContainer,
+                })
+            end
+
+            -- Information List
+            local InfoContainer = New("Frame", {
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, -25),
+                Position = UDim2.fromOffset(0, 22),
+                Parent = UserInfoContainer,
+            })
+
+            New("UIListLayout", {
+                FillDirection = Enum.FillDirection.Vertical,
+                HorizontalAlignment = Enum.HorizontalAlignment.Left,
+                VerticalAlignment = Enum.VerticalAlignment.Top,
+                Padding = UDim.new(0, 2),
+                Parent = InfoContainer,
+            })
+
+            -- Add information items
+            if typeof(WindowInfo.AddInformation) == "table" then
+                for _, info in ipairs(WindowInfo.AddInformation) do
+                    New("TextLabel", {
+                        BackgroundTransparency = 1,
+                        Size = UDim2.new(1, 0, 0, 13),
+                        Text = "• " .. info,
+                        TextSize = 11,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        TextColor3 = Color3.fromRGB(160, 160, 160),
+                        Parent = InfoContainer,
+                    })
+                end
+            end
+
+            -- Update DividerLine position when UserPanel is shown
+            DividerLine.Position = UDim2.fromOffset(InitialLeftWidth, 48 + UserPanelHeight)
+            DividerLine.Size = UDim2.new(0, 1, 1, -48 - UserPanelHeight - 21)
+        end
+
         local BackgroundIcon = Library:GetCustomIcon(WindowInfo.BackgroundImage)
         BackgroundImage = New("ImageLabel", {
             Image = BackgroundIcon and BackgroundIcon.Url or "",
@@ -10077,122 +10180,6 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 20,
             Parent = TitleHolder,
         })
-
-        --// USER PANEL \\--
-        if WindowInfo.AddUserPanel then
-            local UserPanel = New("Frame", {
-                BackgroundColor3 = "MainColor",
-                Size = UDim2.new(1, 0, 0, 110),
-                Position = UDim2.fromOffset(0, 48),
-                Parent = MainFrame,
-                ZIndex = 2,
-            })
-            
-            table.insert(
-                Library.Corners,
-                New("UICorner", {
-                    CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
-                    Parent = UserPanel,
-                })
-            )
-
-            New("UIPadding", {
-                PaddingLeft = UDim.new(0, 12),
-                PaddingRight = UDim.new(0, 12),
-                PaddingTop = UDim.new(0, 10),
-                PaddingBottom = UDim.new(0, 10),
-                Parent = UserPanel,
-            })
-
-            -- User Avatar
-            local UserAvatar = New("ImageLabel", {
-                BackgroundColor3 = Library.Scheme.AccentColor,
-                Image = WindowInfo.UserPanelIcon or "rbxassetid://97682394690683",
-                Size = UDim2.fromOffset(50, 50),
-                Position = UDim2.fromOffset(0, 0),
-                Parent = UserPanel,
-            })
-
-            table.insert(
-                Library.Corners,
-                New("UICorner", {
-                    CornerRadius = UDim.new(0, 6),
-                    Parent = UserAvatar,
-                })
-            )
-
-            -- User Info Container
-            local UserInfoContainer = New("Frame", {
-                BackgroundTransparency = 1,
-                Size = UDim2.new(1, -70, 1, 0),
-                Position = UDim2.fromOffset(60, 0),
-                Parent = UserPanel,
-            })
-
-            -- Username Greeting
-            if WindowInfo.Username then
-                local Username = LocalPlayer.Name
-                local Greeting = New("TextLabel", {
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 0, 25),
-                    Text = "Good Afternoon, @" .. Username .. "!",
-                    TextSize = 14,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    TextColor3 = "FontColor",
-                    Font = Library.Scheme.Font,
-                    Parent = UserInfoContainer,
-                })
-            end
-
-            -- Information List
-            local InfoContainer = New("Frame", {
-                BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 1, -30),
-                Position = UDim2.fromOffset(0, 25),
-                Parent = UserInfoContainer,
-            })
-
-            New("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical,
-                HorizontalAlignment = Enum.HorizontalAlignment.Left,
-                VerticalAlignment = Enum.VerticalAlignment.Top,
-                Padding = UDim.new(0, 3),
-                Parent = InfoContainer,
-            })
-
-            -- Add information items
-            if typeof(WindowInfo.AddInformation) == "table" then
-                for _, info in ipairs(WindowInfo.AddInformation) do
-                    local InfoLabel = New("TextLabel", {
-                        BackgroundTransparency = 1,
-                        Size = UDim2.new(1, 0, 0, 16),
-                        Text = info,
-                        TextSize = 12,
-                        TextXAlignment = Enum.TextXAlignment.Left,
-                        TextColor3 = Color3.fromRGB(180, 180, 180),
-                        Font = Library.Scheme.Font,
-                        Parent = InfoContainer,
-                    })
-                end
-            end
-
-            -- Update DividerLine position
-            if DividerLine then
-                DividerLine.Position = UDim2.fromOffset(0, 158)
-                DividerLine.Size = UDim2.new(1, 0, 1, -169)
-            end
-
-            -- Adjust main content position
-            if LeftFrame then
-                LeftFrame.Position = UDim2.fromOffset(0, 158)
-                LeftFrame.Size = UDim2.new(0, InitialLeftWidth, 1, -169)
-            end
-
-            if ContentContainer then
-                ContentContainer.Position = UDim2.fromOffset(InitialLeftWidth + 1, 158)
-                ContentContainer.Size = UDim2.new(1, -InitialLeftWidth - 1, 1, -169)
-            end
-        end
 
         --// Top Right Bar \\--
         RightWrapper = New("Frame", {
