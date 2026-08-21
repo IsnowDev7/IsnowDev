@@ -6,7 +6,7 @@ Isnow.Appearance.Title = "Isnow"
 Isnow.Appearance.Subtitle = "Choose your access type"
 Isnow.Appearance.Icon = "rbxassetid://134697043118282"
 
-Isnow.Links.Discord = "Discord.gg/isnow"
+Isnow.Links.Discord = "https://discord.gg/qQFPJbVp2P"
 Isnow.Storage.FileName = "Isnow_Key"
 
 Isnow.Options.Keyless = false
