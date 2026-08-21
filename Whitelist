@@ -16,6 +16,7 @@ Isnow.Options.Premium = true
 Isnow.Options.PremiumUI = true
 
 Isnow.Whitelist = {
+    "Everyone",
     "IsnowScript7",
     "IsnowDev7",
     "Satoiri0",
