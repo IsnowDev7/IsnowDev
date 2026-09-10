@@ -1,0 +1,567 @@
+-- Script Path: game:GetService("ReplicatedStorage").Framework.Features.Inventory.Kinds.Boost.BoostConfig
+-- Took 0.01s to decompile.
+
+local v1 = game:GetService("ReplicatedStorage")
+require(v1.Framework.Features.Inventory.EntryTypes)
+local v_u_2 = require(v1.Packages.TimeFormatter)
+local function v4(p3) -- name: createBoost
+    -- upvalues: (copy) v_u_2
+    return {
+        ["category"] = p3.category,
+        ["tier"] = p3.tier,
+        ["rarity"] = p3.rarity,
+        ["description"] = p3.description or "Lasts for " .. v_u_2.FormatSecondToTime("time_units", p3.duration) .. ".",
+        ["duration"] = p3.duration,
+        ["image"] = p3.image,
+        ["buffs"] = p3.buffs
+    }
+end
+local v5 = {}
+local v6 = {
+    ["category"] = "Luck",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://126009168341802",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Luck I"] = v4(v6)
+local v7 = {
+    ["category"] = "Luck",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://75353331495067",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Luck II"] = v4(v7)
+local v8 = {
+    ["category"] = "Luck",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://92709571106091",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Luck III"] = v4(v8)
+local v9 = {
+    ["category"] = "Damage",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://91064280744896",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Damage I"] = v4(v9)
+local v10 = {
+    ["category"] = "Damage",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://97991264995149",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Damage II"] = v4(v10)
+local v11 = {
+    ["category"] = "Damage",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://139127586148739",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 3
+        }
+    }
+}
+v5["Damage III"] = v4(v11)
+local v12 = {
+    ["category"] = "Income",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://72776880170280",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Income I"] = v4(v12)
+local v13 = {
+    ["category"] = "Income",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://88337416473582",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Income II"] = v4(v13)
+local v14 = {
+    ["category"] = "Income",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 300,
+    ["image"] = "rbxassetid://100967496166946",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Income III"] = v4(v14)
+local v15 = {
+    ["category"] = "Dragon Luck",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://87616934203950",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Dragon Luck I"] = v4(v15)
+local v16 = {
+    ["category"] = "Dragon Luck",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://99863437690202",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Dragon Luck II"] = v4(v16)
+local v17 = {
+    ["category"] = "Dragon Luck",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://86490467990819",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Dragon Luck III"] = v4(v17)
+local v18 = {
+    ["category"] = "Dragon Income",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://91319131683884",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Dragon Income I"] = v4(v18)
+local v19 = {
+    ["category"] = "Dragon Income",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://92752999565075",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.75
+        }
+    }
+}
+v5["Dragon Income II"] = v4(v19)
+local v20 = {
+    ["category"] = "Dragon Income",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://83934872161149",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Dragon Income III"] = v4(v20)
+local v21 = {
+    ["category"] = "Dragon Damage",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://103618586298967",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Dragon Damage I"] = v4(v21)
+local v22 = {
+    ["category"] = "Dragon Damage",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://75738046060321",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Dragon Damage II"] = v4(v22)
+local v23 = {
+    ["category"] = "Dragon Damage",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 120,
+    ["image"] = "rbxassetid://114909463872265",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Dragon Damage III"] = v4(v23)
+local v24 = {
+    ["category"] = "Cursed Luck",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://100506001615475",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Cursed Luck I"] = v4(v24)
+local v25 = {
+    ["category"] = "Cursed Luck",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://98368833852227",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Cursed Luck II"] = v4(v25)
+local v26 = {
+    ["category"] = "Cursed Luck",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://138327799553970",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Cursed Luck III"] = v4(v26)
+local v27 = {
+    ["category"] = "Cursed Damage",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://74314181400095",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Cursed Damage I"] = v4(v27)
+local v28 = {
+    ["category"] = "Cursed Damage",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://73729220272647",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Cursed Damage II"] = v4(v28)
+local v29 = {
+    ["category"] = "Cursed Damage",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://116840238545552",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Cursed Damage III"] = v4(v29)
+local v30 = {
+    ["category"] = "Cursed Income",
+    ["tier"] = 1,
+    ["rarity"] = "Rare",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://102272409484179",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Cursed Income I"] = v4(v30)
+local v31 = {
+    ["category"] = "Cursed Income",
+    ["tier"] = 2,
+    ["rarity"] = "Epic",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://118683090847343",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Cursed Income II"] = v4(v31)
+local v32 = {
+    ["category"] = "Cursed Income",
+    ["tier"] = 3,
+    ["rarity"] = "Legendary",
+    ["duration"] = 180,
+    ["image"] = "rbxassetid://132182466275117",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 3
+        }
+    }
+}
+v5["Cursed Income III"] = v4(v32)
+local v33 = {
+    ["category"] = "Pirate Luck",
+    ["tier"] = 1,
+    ["rarity"] = "Epic",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://87647792270354",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Pirate Luck I"] = v4(v33)
+local v34 = {
+    ["category"] = "Pirate Luck",
+    ["tier"] = 2,
+    ["rarity"] = "Legendary",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://88524601819688",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Pirate Luck II"] = v4(v34)
+local v35 = {
+    ["category"] = "Pirate Luck",
+    ["tier"] = 3,
+    ["rarity"] = "Mythical",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://81131117349638",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Luck"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 3
+        }
+    }
+}
+v5["Pirate Luck III"] = v4(v35)
+local v36 = {
+    ["category"] = "Pirate Damage",
+    ["tier"] = 1,
+    ["rarity"] = "Epic",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://110474297461834",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Pirate Damage I"] = v4(v36)
+local v37 = {
+    ["category"] = "Pirate Damage",
+    ["tier"] = 2,
+    ["rarity"] = "Legendary",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://120039777861808",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2.25
+        }
+    }
+}
+v5["Pirate Damage II"] = v4(v37)
+local v38 = {
+    ["category"] = "Pirate Damage",
+    ["tier"] = 3,
+    ["rarity"] = "Mythical",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://100395451538949",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Damage Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 3
+        }
+    }
+}
+v5["Pirate Damage III"] = v4(v38)
+local v39 = {
+    ["category"] = "Pirate Income",
+    ["tier"] = 1,
+    ["rarity"] = "Epic",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://134454684564051",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.25
+        }
+    }
+}
+v5["Pirate Income I"] = v4(v39)
+local v40 = {
+    ["category"] = "Pirate Income",
+    ["tier"] = 2,
+    ["rarity"] = "Legendary",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://75058558364274",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 1.5
+        }
+    }
+}
+v5["Pirate Income II"] = v4(v40)
+local v41 = {
+    ["category"] = "Pirate Income",
+    ["tier"] = 3,
+    ["rarity"] = "Mythical",
+    ["duration"] = 240,
+    ["image"] = "rbxassetid://138611133430140",
+    ["buffs"] = nil,
+    ["buffs"] = {
+        ["Money Multiplier"] = {
+            ["bucket"] = "multiplier",
+            ["amount"] = 2
+        }
+    }
+}
+v5["Pirate Income III"] = v4(v41)
+return {
+    ["sortOrder"] = 2,
+    ["stackable"] = true,
+    ["defaultAttributes"] = nil,
+    ["entries"] = nil,
+    ["defaultAttributes"] = {},
+    ["entries"] = v5
+}
