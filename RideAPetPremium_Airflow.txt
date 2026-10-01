@@ -6,6 +6,7 @@ local Airflow = loader()
 
 local Window = Airflow:CreateWindow({
     Name = "Ride A Pet Premium",
+    Icon = "rbxassetid://103859712365480",
     Title = "Made By IsnowDev7 " .. utf8.char(0xE000),
     LoadingTitle = "Welcome to Ride A Pet Premium " .. utf8.char(0xE000),
     LoadingSubtitle = "Made By IsnowDev7 " .. utf8.char(0xE000),
@@ -23,7 +24,7 @@ local Window = Airflow:CreateWindow({
 
 local Main = Window:CreateTab({
     Name = "Main",
-    Icon = "rbxassetid://103859712365480"
+    Icon = "home"
 })
 
 local TestGroup = Main:AddLeftGroupbox({
