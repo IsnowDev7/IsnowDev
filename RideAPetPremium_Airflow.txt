@@ -1,0 +1,101 @@
+local AIRFLOW_SOURCE = "https://raw.githubusercontent.com/IsnowDev7/IsnowDev/refs/heads/main/IsnowFlowModded.lua"
+
+local source = game:HttpGet(AIRFLOW_SOURCE)
+local loader = assert(loadstring(source), "Airflow source failed to compile")
+local Airflow = loader()
+
+local Window = Airflow:CreateWindow({
+    Name = "Ride A Pet Premium",
+    Title = "Made By IsnowDev7 " .. utf8.char(0xE000),
+    LoadingTitle = "Welcome to Ride A Pet Premium " .. utf8.char(0xE000),
+    LoadingSubtitle = "Made By IsnowDev7 " .. utf8.char(0xE000),
+    FolderName = "RideAPetPremium",
+    FileName = "IsnowFlowModded",
+    Backdrop = { Enabled = true, Dim = true, Tint = 0.55 },
+    Glow = true,
+    ToggleUIKey = Enum.KeyCode.RightControl,
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = "RideAPetPremium",
+        FileName = "AirflowTest"
+    }
+})
+
+local Main = Window:CreateTab({
+    Name = "Main",
+    Icon = "https://i.imgur.com/kd65fBV.jpeg"
+})
+
+local TestGroup = Main:AddLeftGroupbox({
+    Name = "Airflow Test",
+    Side = "Left"
+})
+
+TestGroup:CreateToggle({
+    Name = "Example Toggle",
+    Default = false,
+    Flag = "ExampleToggle",
+    Callback = function(value)
+        print("Example Toggle:", value)
+    end
+})
+
+TestGroup:CreateSlider({
+    Name = "Example Slider",
+    Range = {0, 100},
+    Increment = 1,
+    Default = 50,
+    Flag = "ExampleSlider",
+    Callback = function(value)
+        print("Example Slider:", value)
+    end
+})
+
+TestGroup:CreateDropdown({
+    Name = "Example Dropdown",
+    Options = {"Option 1", "Option 2", "Option 3"},
+    Default = "Option 1",
+    AllowNone = false,
+    Flag = "ExampleDropdown",
+    Callback = function(value)
+        print("Example Dropdown:", value)
+    end
+})
+
+TestGroup:CreateButton({
+    Name = "Example Button",
+    Callback = function()
+        print("Ride A Pet Premium Airflow works")
+    end
+})
+
+
+-- Flexible Paragraph examples: text, code, Imgur/RBX images, and existing UI instances.
+local InfoGroup = Main:AddRightGroupbox({
+    Name = "Paragraph Examples",
+    Side = "Right"
+})
+
+InfoGroup:CreateParagraph({
+    Name = "Image Paragraph",
+    Content = "This paragraph supports Imgur URLs, Roblox asset IDs, and direct image URLs.",
+    Image = "https://i.imgur.com/kd65fBV.jpeg",
+    ImageHeight = 140
+})
+
+InfoGroup:CreateParagraph({
+    Name = "Code Paragraph",
+    Code = true,
+    Content = "local message = 'Airflow Paragraph\nworks with code text'\nprint(message)"
+})
+
+local CustomFrame = Instance.new("Frame")
+CustomFrame.Name = "CustomParagraphFrame"
+CustomFrame.Size = UDim2.new(1, 0, 0, 36)
+CustomFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+CustomFrame.BorderSizePixel = 0
+InfoGroup:CreateParagraph({
+    Name = "Instance Paragraph",
+    Content = "The framework can parent an existing GuiObject into the paragraph.",
+    Instance = CustomFrame
+})
