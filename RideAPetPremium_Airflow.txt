@@ -23,7 +23,7 @@ local Window = Airflow:CreateWindow({
 
 local Main = Window:CreateTab({
     Name = "Main",
-    Icon = "https://i.imgur.com/kd65fBV.jpeg"
+    Icon = "rbxassetid://103859712365480"
 })
 
 local TestGroup = Main:AddLeftGroupbox({
