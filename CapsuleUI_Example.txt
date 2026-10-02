@@ -1,0 +1,56 @@
+local CAPSULE_SOURCE = "https://raw.githubusercontent.com/IsnowDev7/IsnowDev/refs/heads/main/CapsuleUI.lua"
+
+local source = game:HttpGet(CAPSULE_SOURCE)
+local loader = assert(loadstring(source), "CapsuleUI source failed to compile")
+local CapsuleUI = loader()
+
+local Window = CapsuleUI:CreateWindow({
+    Title = "Shiny Syndicate",
+    CapsuleTitle = "Shiny Syndicate",
+    CapsuleIcon = "image",
+    Width = 640,
+    Height = 400,
+    BlurSize = 12,
+})
+
+local Main = Window:CreateTab({
+    Name = "Main",
+    Icon = "house",
+})
+
+local General = Main:CreateSection({
+    Title = "General",
+})
+
+General:CreateToggle({
+    Title = "Enabled",
+    Default = false,
+    Callback = function(Value)
+        print(Value)
+    end,
+})
+
+General:CreateDropdown({
+    Title = "Mode",
+    Values = {"Legit", "Balanced", "Fast"},
+})
+
+General:CreateSlider({
+    Title = "Speed",
+    Min = 0,
+    Max = 100,
+    Default = 16,
+})
+
+Main:CreateBlank({
+    Title = "Custom",
+    Builder = function(Container)
+        -- Put any Roblox Instances here.
+    end,
+})
+
+Window:Notify({
+    Title = "CapsuleUI",
+    Content = "Interface loaded.",
+    Duration = 3,
+})
